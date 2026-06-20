@@ -129,16 +129,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Expr.cpp" />
+    <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="Lox.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="RuntimeError.cpp" />
     <ClCompile Include="Scanner.cpp" />
     <ClCompile Include="Token.cpp" />
     <ClCompile Include="TokenType.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Expr.h" />
+    <ClInclude Include="Interpreter.h" />
     <ClInclude Include="Lox.h" />
+    <ClInclude Include="Parser.h" />
+    <ClInclude Include="RuntimeError.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="TokenType.h" />

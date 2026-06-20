@@ -16,7 +16,6 @@ public:
 
 private:
 
-	bool isAtEnd();
 
 	std::string source;
 	std::vector<Token> tokens {};

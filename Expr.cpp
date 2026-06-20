@@ -1,109 +1,62 @@
 #include "Expr.h"
 
-class ExprVisitor {
-public:
-	virtual std::string visitBinaryExpr(const Binary& expr) = 0;
-	virtual std::string visitGroupingExpr(const Grouping& expr) = 0;
-	virtual std::string visitLiteralExpr(const Literal& expr) = 0;
-	virtual std::string visitUnaryExpr(const Unary& expr) = 0;
-	virtual std::string visitCommaExpr(const Comma& expr) = 0;
-	virtual std::string visitTernaryExpr(const Ternary& expr) = 0;
-	virtual ~ExprVisitor() = default;
 
-};
+// Expr
 
-class Expr {
-public:
-	virtual~ Expr() = default;
-	virtual std::string accept(ExprVisitor& visitor) const = 0;
-};
+Expr::~Expr() = default;
 
+// Binary
 
-class Binary : public Expr {
-public:
-	Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right) :
-		left(std::move(left)), right(std::move(right)), op(std::move(op))
-	{}
+Binary::Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right) :
+	left(std::move(left)), right(std::move(right)), op(std::move(op))
+{} 
 
-	std::string accept(ExprVisitor& visitor) const override {
-		return visitor.visitBinaryExpr(*this);
-	}
+std::any Binary::accept(ExprVisitor& visitor) const {
+	return visitor.visitBinaryExpr(*this);
+}
 
+// Grouping
 
-	std::unique_ptr<Expr> left;
-	Token op;
-	std::unique_ptr<Expr> right;
+Grouping::Grouping(std::unique_ptr<Expr> expression)
+	: expression(std::move(expression))
+{}
 
-};
+std::any Grouping::accept(ExprVisitor& visitor) const {
+	return visitor.visitGroupingExpr(*this);
+}
 
+// Literal
 
+Literal::Literal(std::any value) :
+	value(std::move(value)) {}
 
-class Grouping : public Expr {
-public:
-	explicit Grouping(std::unique_ptr<Expr> expression) :
-		expression(std::move(expression)) {}
+std::any Literal::accept(ExprVisitor& visitor) const  {
+	return visitor.visitLiteralExpr(*this);
+}
 
-	std::string accept(ExprVisitor& visitor) const override {
-		return visitor.visitGroupingExpr(*this);
-	}
+// Unary
 
+Unary::Unary(Token op, std::unique_ptr<Expr> right) :
+	op(std::move(op)), right(std::move(right)) {}
 
-	std::unique_ptr<Expr> expression;
-};
+std::any Unary::accept(ExprVisitor& visitor) const {
+	return visitor.visitUnaryExpr(*this);
+}
 
+// Comma
 
-class Literal : public Expr {
-public:
-	explicit Literal(std::any value) :
-		value(std::move(value)) {}
+Comma::Comma(std::vector<std::unique_ptr<Expr>> exprs) :
+	exprs(std::move(exprs)) {}
 
-	std::string accept(ExprVisitor& visitor) const override {
-		return visitor.visitLiteralExpr(*this);
-	}
+std::any Comma::accept(ExprVisitor& visitor) const  {
+	return visitor.visitCommaExpr(*this);
+}
 
+// Ternary 
 
-	std::any value;
-};
+Ternary::Ternary(std::unique_ptr<Expr> condition, std::unique_ptr<Expr> thenExpr, std::unique_ptr<Expr> elseExpr) :
+	condition{ std::move(condition) }, thenExpr(std::move(thenExpr)), elseExpr(std::move(elseExpr)) {}
 
-
-class Unary : public Expr {
-public:
-	Unary(Token op, std::unique_ptr<Expr> right) :
-		op(std::move(op)), right(std::move(right)) {}
-
-	std::string accept(ExprVisitor& visitor) const override {
-		return visitor.visitUnaryExpr(*this);
-	}
-
-
-	Token op;
-	std::unique_ptr<Expr> right;
-
-
-};
-
-class Comma : public Expr {
-public:
-	Comma(std::vector<std::unique_ptr<Expr>> exprs) :
-		exprs(std::move(exprs)) {}
-
-	std::string accept(ExprVisitor& visitor) const override {
-		return visitor.visitCommaExpr(*this);
-	}
-
-	std::vector<std::unique_ptr<Expr>> exprs;
-};
-
-class Ternary : public Expr {
-public:
-	Ternary(std::unique_ptr<Expr> condition, std::unique_ptr<Expr> thenExpr, std::unique_ptr<Expr> elseExpr) :
-		condition{ std::move(condition) }, thenExpr(std::move(thenExpr)), elseExpr(std::move(elseExpr)) {}
-
-	std::string accept(ExprVisitor& visitor) const override {
-		return visitor.visitTernaryExpr(*this);
-	}
-
-	std::unique_ptr<Expr> condition;
-	std::unique_ptr<Expr> thenExpr;
-	std::unique_ptr<Expr> elseExpr;
-};
+std::any Ternary::accept(ExprVisitor& visitor) const {
+	return visitor.visitTernaryExpr(*this);
+}
