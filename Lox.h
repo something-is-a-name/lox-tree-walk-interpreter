@@ -3,14 +3,15 @@
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
-#include <string>
+#include <vector>
 #include <string>
 #include "Token.h"
 #include "RuntimeError.h"
-#include "Interpreter.h"
+
 #include "Scanner.h"
 #include "Parser.h"
 
+class Interpreter;
 
 class Lox {
 public:
@@ -34,6 +35,7 @@ private:
 
     inline static bool hadError{ false };
     inline static bool hadRuntimeError{ true };
-    inline static Interpreter interpreter = Interpreter();
+
+     static Interpreter interpreter;
 
 };

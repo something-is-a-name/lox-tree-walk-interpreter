@@ -1,13 +1,16 @@
 #include "Expr.h"
 #include "RuntimeError.h"
 #include <iostream>
-#include "Lox.h"
+#include "Stmt.h"
+#include <sstream>
 
-class Interpreter : public ExprVisitor {
+class Lox; 
+
+class Interpreter : public ExprVisitor, public StmtVisitor {
 
 public:
-
-	void interpret(const Expr& expression);
+	Interpreter() {}
+	void interpret(const std::vector<std::unique_ptr<Stmt>>& statements);
 
 	std::any visitLiteralExpr(const Literal& expr) override;
 
@@ -19,11 +22,17 @@ public:
 
 	std::any visitCommaExpr(const Comma& expr) override;
 
-	std::any visitTernaryExpr(const Ternary& expr);
+	std::any visitTernaryExpr(const Ternary& expr) override;
+
+	std::any visitExpressionStmt(const Expression& stmt) override;
+
+	std::any visitPrintStmt(const Print& stmt) override;
 
 private:
 
 	std::any evaluate(const Expr& expr);
+
+	void execute(const Stmt& stmt);
 
 	bool  isTruthy(std::any& v);
 
@@ -39,5 +48,5 @@ private:
 
 	void checkNumberOperands(Token op, std::any& left, std::any& right);
 
-	std::string stringify(std::any& v);
+	std::string stringify(const std::any& v);
 };

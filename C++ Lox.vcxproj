@@ -135,6 +135,7 @@
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="RuntimeError.cpp" />
     <ClCompile Include="Scanner.cpp" />
+    <ClCompile Include="Stmt.cpp" />
     <ClCompile Include="Token.cpp" />
     <ClCompile Include="TokenType.cpp" />
   </ItemGroup>
@@ -145,6 +146,7 @@
     <ClInclude Include="Parser.h" />
     <ClInclude Include="RuntimeError.h" />
     <ClInclude Include="Scanner.h" />
+    <ClInclude Include="Stmt.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="TokenType.h" />
   </ItemGroup>

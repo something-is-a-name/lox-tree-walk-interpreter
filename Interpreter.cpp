@@ -1,11 +1,13 @@
 #include "Interpreter.h"
+#include "Lox.h"
 
 
 
-void Interpreter::interpret(const Expr& expression) {
+void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>>& statements) {
 	try {
-		std::any value = evaluate(expression);
-		std::cout << stringify(value);
+		for (auto& statement : statements) {
+			execute(*statement);
+		}
 	}
 	catch (RuntimeError error) {
 		Lox::runtimeError(error);
@@ -84,21 +86,22 @@ std::any Interpreter::visitBinaryExpr(const Binary& expr)  {
 }
 
 std::any Interpreter::visitCommaExpr(const Comma& expr)  {
+	std::any result;
 
 	for (auto& e : expr.exprs) {
-		evaluate(*e);
+		result = evaluate(*e);
 	}
 
-	return expr.exprs.back().get();
+	return result;
 }
 
 std::any Interpreter::visitTernaryExpr(const Ternary& expr) {
 
 	if (expr.condition) {
-		evaluate(*expr.thenExpr);
+		return evaluate(*expr.thenExpr);
 	}
 	else {
-		evaluate(*expr.elseExpr);
+		return evaluate(*expr.elseExpr);
 	}
 }
 
@@ -107,9 +110,28 @@ std::any Interpreter::evaluate(const Expr& expr) {
 	return expr.accept(*this);
 }
 
+void Interpreter::execute(const Stmt& stmt) {
+	stmt.accept(*this);
+}
+
+std::any Interpreter::visitExpressionStmt(const Expression& stmt) {
+	evaluate(*stmt.expression);
+
+	return nullptr;
+}
+
+std::any Interpreter::visitPrintStmt(const Print& stmt) {
+	auto value = evaluate(*stmt.expression);
+	std::cout << stringify(value);
+	
+	return nullptr;
+}
+
+
 bool  Interpreter::isTruthy(std::any& v) {
 	if (!v.has_value()) return false;
 	if (v.type() == typeid(bool)) return asBool(v);
+	return true;
 }
 
 bool Interpreter::isEqual(std::any& a, std::any& b) {
@@ -129,6 +151,8 @@ bool Interpreter::isEqual(std::any& a, std::any& b) {
 	if (auto av = std::any_cast<std::string>(&a)) {
 		return *av == std::any_cast<std::string>(b);
 	}
+
+	return false;
 }
 
 double Interpreter::asNumber(const std::any& v) {
@@ -153,15 +177,15 @@ void Interpreter::checkNumberOperands(Token op, std::any& left, std::any& right)
 	throw RuntimeError(op, " Operands must be numbers.");
 }
 
-std::string Interpreter::stringify(std::any& v) {
+std::string Interpreter::stringify(const std::any& v) {
 	if (!v.has_value()) return "nil";
 
 	if (v.type() == typeid(double)) {
-		std::string text = std::to_string(asNumber(v));
-		if (text.ends_with('.0')) {
-			text = text.substr(0, text.length() - 2);
-		}
-		return text;
+		double x = asNumber(v);
+
+		std::ostringstream out {};
+		out << x;
+		return out.str();
 	}
 
 	if (v.type() == typeid(bool)) {

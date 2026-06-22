@@ -2,8 +2,9 @@
 
 
 #include "Lox.h"
+#include "Interpreter.h"
 
-
+Interpreter Lox::interpreter = Interpreter();
 
 void Lox::runFile(const std::string& path) {
     std::ifstream input(path, std::ios::binary);
@@ -52,11 +53,11 @@ void Lox::runPrompt() {
      Scanner scanner = Scanner(source);
      std::vector<Token> tokens = scanner.scanTokens();
      Parser parser = Parser(tokens);
-     std::unique_ptr<Expr> expresssion = parser.parse();
+     std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
 
      if (hadError) return;
 
-     interpreter.interpret(*expresssion);
+     interpreter.interpret(statements);
 
  }
 

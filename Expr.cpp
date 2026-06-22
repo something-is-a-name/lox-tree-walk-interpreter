@@ -30,7 +30,7 @@ std::any Grouping::accept(ExprVisitor& visitor) const {
 Literal::Literal(std::any value) :
 	value(std::move(value)) {}
 
-std::any Literal::accept(ExprVisitor& visitor) const  {
+std::any Literal::accept(ExprVisitor& visitor) const {
 	return visitor.visitLiteralExpr(*this);
 }
 
@@ -48,7 +48,7 @@ std::any Unary::accept(ExprVisitor& visitor) const {
 Comma::Comma(std::vector<std::unique_ptr<Expr>> exprs) :
 	exprs(std::move(exprs)) {}
 
-std::any Comma::accept(ExprVisitor& visitor) const  {
+std::any Comma::accept(ExprVisitor& visitor) const {
 	return visitor.visitCommaExpr(*this);
 }
 

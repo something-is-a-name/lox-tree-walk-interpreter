@@ -1,7 +1,3 @@
-#include "Expr.h"
-#include <vector> 
-#include <stdexcept>
-#include "Lox.h"
 #include "Parser.h"
 
 
@@ -76,9 +72,61 @@ Token Parser::previous() {
 	return tokens.at(current - 1);
 }
 
+std::unique_ptr<Stmt> Parser::statement() {
+	if (match({ PRINT })) return printStatement();
+
+	return expressionStatement();
+
+
+}
+
+std::unique_ptr<Stmt> Parser::printStatement() {
+	auto value = expression();
+	consume(SEMICOLON, "Expected ';' after value.");
+
+	return std::make_unique<Print>(std::move(value));
+
+}
+
+std::unique_ptr<Stmt> Parser::varDeclaration() {
+	Token name = consume(IDENTIFIER, "Expected variable name.");
+
+	auto initializer = std::make_unique<Expr>();
+
+	if (match({ EQUAL })) {
+		initializer = expression();
+	}
+
+	consume(SEMICOLON, "Expected ';' after variable declaration.");
+	return std::make_unique<Var>(std::move(name), std::move(initializer));
+}
+
+
+std::unique_ptr<Stmt> Parser::expressionStatement() {
+	auto expr = expression();
+	consume(SEMICOLON, "Expect ';' after expression.");
+
+	return std::make_unique<Expression>(std::move(expr));
+
+}
+
 std::unique_ptr<Expr> Parser::expression() {
 	return comma();
 }
+
+
+std::unique_ptr<Stmt> Parser::declaration() {
+	try {
+		if (match({ VAR })) return varDeclaration();
+
+		return statement();
+	}
+	catch (ParseError error) {
+		synchonize();
+		return nullptr;
+	}
+}
+
 
 std::unique_ptr<Expr> Parser::comma() {
 
@@ -182,6 +230,10 @@ std::unique_ptr<Expr> Parser::primary() {
 		return std::make_unique<Literal>(previous().literal);
 	}
 
+	if (match({ IDENTIFIER })) {
+		return std::make_unique<Variable>(previous());
+	}
+
 	if (match({ LEFT_PAREN })) {
 		std::unique_ptr<Expr> expr = expression();
 		consume(RIGHT_PAREN, "Expected ')' after expression.");
@@ -196,11 +248,12 @@ std::unique_ptr<Expr> Parser::primary() {
 Parser::Parser(std::vector<Token> tokens) :
 	tokens(std::move(tokens)) {}
 
-std::unique_ptr<Expr> Parser::parse() {
-	try {
-		return expression();
+std::vector<std::unique_ptr<Stmt>> Parser::parse() {
+
+	std::vector<std::unique_ptr<Stmt>> statements {};
+	while (!isAtEnd()) {
+		statements.push_back(declaration());
 	}
-	catch (Parser::ParseError error) {
-		return nullptr;
-	}
+
+	return statements;
 }

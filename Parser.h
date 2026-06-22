@@ -2,7 +2,11 @@
 #include "Expr.h"
 #include <vector> 
 #include <stdexcept>
+#include "Stmt.h"
 #include "Lox.h"
+#include <memory>
+
+
 
 class Parser {
 private:
@@ -36,7 +40,18 @@ private:
 
 	Token previous();
 
+	std::unique_ptr<Stmt> printStatement();
+
+	std::unique_ptr<Stmt> varDeclaration();
+
+	std::unique_ptr<Stmt> expressionStatement();
+
+	std::unique_ptr<Stmt> statement();
+
 	std::unique_ptr<Expr> expression();
+
+
+	std::unique_ptr<Stmt> declaration();
 
 	std::unique_ptr<Expr> comma();
 
@@ -58,6 +73,6 @@ private:
 public:
 	Parser(std::vector<Token> tokens);
 
-	std::unique_ptr<Expr> parse();
+	std::vector<std::unique_ptr<Stmt>> parse();
 
 };
