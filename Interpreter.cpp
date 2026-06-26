@@ -105,6 +105,10 @@ std::any Interpreter::visitTernaryExpr(const Ternary& expr) {
 	}
 }
 
+std::any Interpreter::visitVariableExpr(const Variable& expr) {
+	return environment.get(expr.name);
+}
+
 
 std::any Interpreter::evaluate(const Expr& expr) {
 	return expr.accept(*this);
@@ -124,6 +128,16 @@ std::any Interpreter::visitPrintStmt(const Print& stmt) {
 	auto value = evaluate(*stmt.expression);
 	std::cout << stringify(value);
 	
+	return nullptr;
+}
+
+std::any Interpreter::visitVarStmt(const Var& stmt) {
+	std::any value {};
+	if (stmt.initializer != nullptr) {
+		value = evaluate(*stmt.initializer);
+	}
+	// Set to empty value if no initializer is given (nil)
+	environment.define(stmt.name.lexeme, value);
 	return nullptr;
 }
 

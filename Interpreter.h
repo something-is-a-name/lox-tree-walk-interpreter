@@ -2,6 +2,7 @@
 #include "RuntimeError.h"
 #include <iostream>
 #include "Stmt.h"
+#include "Environment.h"
 #include <sstream>
 
 class Lox; 
@@ -24,11 +25,19 @@ public:
 
 	std::any visitTernaryExpr(const Ternary& expr) override;
 
+	std::any visitAssignExpr(const Assign& expr) override;
+
+	std::any visitVariableExpr(const Variable& expr) override;
+
 	std::any visitExpressionStmt(const Expression& stmt) override;
 
 	std::any visitPrintStmt(const Print& stmt) override;
 
+	std::any visitVarStmt(const Var& stmt) override;
+
 private:
+
+	Environment environment{};
 
 	std::any evaluate(const Expr& expr);
 

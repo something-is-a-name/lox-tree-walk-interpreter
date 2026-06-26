@@ -60,3 +60,22 @@ Ternary::Ternary(std::unique_ptr<Expr> condition, std::unique_ptr<Expr> thenExpr
 std::any Ternary::accept(ExprVisitor& visitor) const {
 	return visitor.visitTernaryExpr(*this);
 }
+
+// Variable
+
+Variable::Variable(Token name) :
+	name(std::move(name)) {}
+
+
+std::any Variable::accept(ExprVisitor& visitor) const {
+	return visitor.visitVariableExpr(*this);
+}
+
+// Assign
+
+Assign::Assign(Token name, std::unique_ptr<Expr> value) :
+	name(std::move(name)), value(std::move(value)) {}
+
+std::any Assign::accept(ExprVisitor& visitor) const {
+	return visitor.visitAssignExpr(*this);
+}

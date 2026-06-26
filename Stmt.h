@@ -16,7 +16,7 @@ public:
     //virtual std::any visitBlockStmt(const Block& stmt) = 0;
     virtual std::any visitExpressionStmt(const Expression& stmt) = 0;
     virtual std::any visitPrintStmt(const Print& stmt) = 0;
-    //virtual std::any visitVarStmt(const Var& stmt) = 0;
+    virtual std::any visitVarStmt(const Var& stmt) = 0;
 
     virtual ~StmtVisitor() = default;
 };

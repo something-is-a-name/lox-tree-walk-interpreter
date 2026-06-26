@@ -50,8 +50,9 @@ private:
 
 	std::unique_ptr<Expr> expression();
 
-
 	std::unique_ptr<Stmt> declaration();
+
+	std::unique_ptr<Expr> assignment();
 
 	std::unique_ptr<Expr> comma();
 

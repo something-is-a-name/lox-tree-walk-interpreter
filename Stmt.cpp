@@ -6,7 +6,7 @@ Stmt::~Stmt() = default;
 
 // Block
 
-/*
+
 Block::Block(std::vector<std::unique_ptr<Stmt>> statements) :
 	statements(std::move(statements)) {}
 
@@ -14,7 +14,7 @@ Block::Block(std::vector<std::unique_ptr<Stmt>> statements) :
 std::any Block::accept(StmtVisitor& visitor) const {
 	return visitor.visitBlockStmt(*this);
 }
-*/
+
 
 // Expression
 
@@ -34,12 +34,11 @@ std::any Print::accept(StmtVisitor& visitor) const {
 	return visitor.visitPrintStmt(*this);
 }
 
-// Var
-/*
+
 Var::Var(Token name, std::unique_ptr<Expr> initializer) :
 	name(std::move(name)), initializer(std::move(initializer)) {}
 
 std::any Var::accept(StmtVisitor& visitor) const {
 	return visitor.visitVarStmt(*this);
 }
-*/
+

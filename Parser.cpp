@@ -114,6 +114,19 @@ std::unique_ptr<Expr> Parser::expression() {
 	return comma();
 }
 
+std::unique_ptr<Stmt> Parser::assignment() {
+	auto expr = comma();
+
+	if (match({ EQUAL })) {
+		Token equals = previous();
+		auto value = assignment();
+
+		if (auto* variable = dynamic_cast<Variable*>(expr.get())) {
+			Token name = variable->name;
+			return std::make_unique<Assign>(std::move(name), std::move(value));
+		}
+	}
+}
 
 std::unique_ptr<Stmt> Parser::declaration() {
 	try {
