@@ -73,7 +73,9 @@ Token Parser::previous() {
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
+	if (match({ IF }))  return ifStatement();
 	if (match({ PRINT })) return printStatement();
+	if (match({ LEFT_BRACE })) return std::make_unique<Block>(block());
 
 	return expressionStatement();
 
@@ -91,7 +93,7 @@ std::unique_ptr<Stmt> Parser::printStatement() {
 std::unique_ptr<Stmt> Parser::varDeclaration() {
 	Token name = consume(IDENTIFIER, "Expected variable name.");
 
-	auto initializer = std::make_unique<Expr>();
+	std::unique_ptr<Expr> initializer = nullptr;
 
 	if (match({ EQUAL })) {
 		initializer = expression();
@@ -101,20 +103,46 @@ std::unique_ptr<Stmt> Parser::varDeclaration() {
 	return std::make_unique<Var>(std::move(name), std::move(initializer));
 }
 
+std::unique_ptr<Stmt> Parser::ifStatement() {
+	consume(LEFT_PAREN, "Expected  '('  after 'if' .");
+	auto condition = expression();
+	consume(RIGHT_PAREN, "Expected  ')'  after if condition.");
+
+	auto thenBranch = statement();
+	std::unique_ptr<Stmt> elseBranch { nullptr };
+	if (match({ ELSE })) {
+		elseBranch = statement();
+	}
+
+	return std::make_unique<If>(std::move(condition), std::move(thenBranch), std::move(elseBranch));
+
+}
+
 
 std::unique_ptr<Stmt> Parser::expressionStatement() {
 	auto expr = expression();
-	consume(SEMICOLON, "Expect ';' after expression.");
+	consume(SEMICOLON, "Expected ';' after expression.");
 
 	return std::make_unique<Expression>(std::move(expr));
 
 }
 
-std::unique_ptr<Expr> Parser::expression() {
-	return comma();
+std::vector<std::unique_ptr<Stmt>> Parser::block() {
+	std::vector<std::unique_ptr<Stmt>> statements {};
+
+	while (!check(RIGHT_BRACE) && !isAtEnd()) {
+		statements.push_back(declaration());
+	}
+
+	consume(RIGHT_BRACE, "Expected '}' after block.");
+	return statements;
 }
 
-std::unique_ptr<Stmt> Parser::assignment() {
+std::unique_ptr<Expr> Parser::expression() {
+	return assignment();
+}
+
+std::unique_ptr<Expr> Parser::assignment() {
 	auto expr = comma();
 
 	if (match({ EQUAL })) {
@@ -125,7 +153,12 @@ std::unique_ptr<Stmt> Parser::assignment() {
 			Token name = variable->name;
 			return std::make_unique<Assign>(std::move(name), std::move(value));
 		}
+
+		Lox::error(equals, "Invalid assignment target.");
+
 	}
+
+	return expr;
 }
 
 std::unique_ptr<Stmt> Parser::declaration() {

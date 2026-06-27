@@ -1,7 +1,9 @@
 #include "Interpreter.h"
 #include "Lox.h"
 
-
+Interpreter::Interpreter() {
+	environment = new Environment(nullptr);
+}
 
 void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>>& statements) {
 	try {
@@ -97,7 +99,9 @@ std::any Interpreter::visitCommaExpr(const Comma& expr)  {
 
 std::any Interpreter::visitTernaryExpr(const Ternary& expr) {
 
-	if (expr.condition) {
+	std::any condition = evaluate(*expr.condition);
+
+	if (isTruthy(condition)) {
 		return evaluate(*expr.thenExpr);
 	}
 	else {
@@ -106,7 +110,13 @@ std::any Interpreter::visitTernaryExpr(const Ternary& expr) {
 }
 
 std::any Interpreter::visitVariableExpr(const Variable& expr) {
-	return environment.get(expr.name);
+	return environment->get(expr.name);
+}
+
+std::any Interpreter::visitAssignExpr(const Assign& expr) {
+	std::any value = evaluate(*expr.value);
+	environment->assign(expr.name, value);
+	return value;
 }
 
 
@@ -137,10 +147,45 @@ std::any Interpreter::visitVarStmt(const Var& stmt) {
 		value = evaluate(*stmt.initializer);
 	}
 	// Set to empty value if no initializer is given (nil)
-	environment.define(stmt.name.lexeme, value);
+	environment->define(stmt.name.lexeme, value);
 	return nullptr;
 }
 
+
+std::any Interpreter::visitBlockStmt(const Block& stmt) {
+	Environment newEnvironment(this->environment);
+	executeBlock(stmt.statements, &newEnvironment);
+
+	return nullptr;
+}
+
+std::any Interpreter::visitIfStmt(const If& stmt) {
+	std::any condition = evaluate(*stmt.condition);
+
+	if (isTruthy(condition)){
+		execute(*stmt.thenBranch);
+	}
+	else if (stmt.elseBranch != nullptr) {
+		execute(*stmt.elseBranch);
+	}
+}
+
+void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment) {
+	Environment* previous = this->environment;
+	try {
+		this->environment = environment;
+
+		for (const auto& statement : statements) {
+			execute(*statement);
+		}
+	}
+	catch(...) {
+		this->environment = previous;
+		throw;
+	}
+
+	this->environment = previous;
+}
 
 bool  Interpreter::isTruthy(std::any& v) {
 	if (!v.has_value()) return false;

@@ -9,14 +9,16 @@ class Block;
 class Expression;
 class Print;
 class Var;
+class If;
 
 
 class StmtVisitor {
 public:
-    //virtual std::any visitBlockStmt(const Block& stmt) = 0;
+    virtual std::any visitBlockStmt(const Block& stmt) = 0;
     virtual std::any visitExpressionStmt(const Expression& stmt) = 0;
     virtual std::any visitPrintStmt(const Print& stmt) = 0;
     virtual std::any visitVarStmt(const Var& stmt) = 0;
+    virtual std::any visitIfStmt(const If& stmt) = 0;
 
     virtual ~StmtVisitor() = default;
 };
@@ -66,4 +68,15 @@ public:
 
     Token name;
     std::unique_ptr<Expr> initializer;
+};
+
+class If : public Stmt {
+public:
+    If(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenBranch, std::unique_ptr<Stmt> elseBranch);
+
+    std::any accept(StmtVisitor& visitor)const  override;
+
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> thenBranch;
+    std::unique_ptr<Stmt> elseBranch;
 };

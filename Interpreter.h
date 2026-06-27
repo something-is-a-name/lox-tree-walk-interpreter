@@ -10,7 +10,9 @@ class Lox;
 class Interpreter : public ExprVisitor, public StmtVisitor {
 
 public:
-	Interpreter() {}
+
+	Interpreter();
+
 	void interpret(const std::vector<std::unique_ptr<Stmt>>& statements);
 
 	std::any visitLiteralExpr(const Literal& expr) override;
@@ -35,9 +37,15 @@ public:
 
 	std::any visitVarStmt(const Var& stmt) override;
 
+	std::any visitBlockStmt(const Block& stmt) override;
+
+	std::any visitIfStmt(const If& stmt) override;
+
+	void executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment);
+
 private:
 
-	Environment environment{};
+	Environment* environment;
 
 	std::any evaluate(const Expr& expr);
 

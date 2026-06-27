@@ -42,3 +42,12 @@ std::any Var::accept(StmtVisitor& visitor) const {
 	return visitor.visitVarStmt(*this);
 }
 
+// If
+
+If::If(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> thenBranch, std::unique_ptr<Stmt> elseBranch) :
+	condition(std::move(condition)), thenBranch(std::move(thenBranch)), elseBranch(std::move(elseBranch)) {}
+
+
+std::any If::accept(StmtVisitor& visitor) const {
+	return visitor.visitIfStmt(*this);
+}
