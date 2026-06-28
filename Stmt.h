@@ -10,6 +10,7 @@ class Expression;
 class Print;
 class Var;
 class If;
+class While;
 
 
 class StmtVisitor {
@@ -19,6 +20,7 @@ public:
     virtual std::any visitPrintStmt(const Print& stmt) = 0;
     virtual std::any visitVarStmt(const Var& stmt) = 0;
     virtual std::any visitIfStmt(const If& stmt) = 0;
+    virtual std::any visitWhileStmt(const While& stmt) = 0;
 
     virtual ~StmtVisitor() = default;
 };
@@ -79,4 +81,14 @@ public:
     std::unique_ptr<Expr> condition;
     std::unique_ptr<Stmt> thenBranch;
     std::unique_ptr<Stmt> elseBranch;
+};
+
+class While : public Stmt {
+public:
+    While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body);
+
+    std::any accept(StmtVisitor& visitor)const override;
+
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> body;
 };

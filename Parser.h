@@ -48,6 +48,10 @@ private:
 
 	std::unique_ptr<Stmt> ifStatement();
 
+	std::unique_ptr<Stmt> whileStatement();
+
+	std::unique_ptr<Stmt> forStatement();
+
 	std::vector<std::unique_ptr<Stmt>> block();
 
 	std::unique_ptr<Stmt> statement();
@@ -57,6 +61,10 @@ private:
 	std::unique_ptr<Stmt> declaration();
 
 	std::unique_ptr<Expr> assignment();
+
+	std::unique_ptr<Expr> orExpr();
+
+	std::unique_ptr<Expr> andExpr();
 
 	std::unique_ptr<Expr> comma();
 

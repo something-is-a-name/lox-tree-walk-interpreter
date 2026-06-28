@@ -31,6 +31,8 @@ public:
 
 	std::any visitVariableExpr(const Variable& expr) override;
 
+	std::any visitLogicalExpr(const Logical& expr) override;
+
 	std::any visitExpressionStmt(const Expression& stmt) override;
 
 	std::any visitPrintStmt(const Print& stmt) override;
@@ -40,6 +42,8 @@ public:
 	std::any visitBlockStmt(const Block& stmt) override;
 
 	std::any visitIfStmt(const If& stmt) override;
+
+	std::any visitWhileStmt(const While& stmt) override;
 
 	void executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment);
 

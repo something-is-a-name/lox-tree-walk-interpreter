@@ -15,6 +15,7 @@ class Comma;
 class Ternary;
 class Variable;
 class Assign;
+class Logical;
 
 class ExprVisitor {
 public:
@@ -26,6 +27,7 @@ public:
     virtual std::any visitTernaryExpr(const Ternary& expr) = 0;
     virtual std::any visitVariableExpr(const Variable& expr) = 0;
     virtual std::any visitAssignExpr(const Assign& expr) = 0;
+    virtual std::any visitLogicalExpr(const Logical& expr) = 0;
 
     virtual ~ExprVisitor() = default;
 };
@@ -112,4 +114,17 @@ public:
 
     Token name;
     std::unique_ptr<Expr> value;
+};
+
+class Logical : public Expr {
+public:
+    Logical(std::unique_ptr<Expr> left,
+        Token op,
+        std::unique_ptr<Expr> right);
+
+    std::any accept(ExprVisitor& visitor)const override;
+
+    std::unique_ptr<Expr> left;
+    Token op;
+    std::unique_ptr<Expr> right;
 };

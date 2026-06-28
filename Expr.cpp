@@ -79,3 +79,14 @@ Assign::Assign(Token name, std::unique_ptr<Expr> value) :
 std::any Assign::accept(ExprVisitor& visitor) const {
 	return visitor.visitAssignExpr(*this);
 }
+
+// Logical
+
+Logical::Logical(std::unique_ptr<Expr> left,
+	Token op,
+	std::unique_ptr<Expr> right) :
+	left(std::move(left)), right(std::move(right)), op(std::move(op)) {}
+
+std::any Logical::accept(ExprVisitor& visitor)const {
+	return visitor.visitLogicalExpr(*this);
+}

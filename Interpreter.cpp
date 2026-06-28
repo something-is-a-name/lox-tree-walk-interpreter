@@ -119,6 +119,20 @@ std::any Interpreter::visitAssignExpr(const Assign& expr) {
 	return value;
 }
 
+std::any Interpreter::visitLogicalExpr(const Logical& expr) {
+	std::any left = evaluate(*expr.left);
+
+	// Logical operands short-circuit
+	if (expr.op.type == TokenType::OR) {
+		if (isTruthy(left)) return left;
+	}
+	else {
+		if (!isTruthy(left)) return left;
+	}
+
+	return evaluate(*expr.right);
+}
+
 
 std::any Interpreter::evaluate(const Expr& expr) {
 	return expr.accept(*this);
@@ -168,6 +182,20 @@ std::any Interpreter::visitIfStmt(const If& stmt) {
 	else if (stmt.elseBranch != nullptr) {
 		execute(*stmt.elseBranch);
 	}
+
+	return nullptr;
+}
+
+std::any Interpreter::visitWhileStmt(const While& stmt) {
+	std::any condition = evaluate(*stmt.condition);
+
+	while (isTruthy(condition)) {
+		execute(*stmt.body);
+		condition = evaluate(*stmt.condition);
+	}
+
+	return nullptr;
+
 }
 
 void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment) {
