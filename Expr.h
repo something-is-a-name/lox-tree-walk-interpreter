@@ -16,6 +16,7 @@ class Ternary;
 class Variable;
 class Assign;
 class Logical;
+class Call;
 
 class ExprVisitor {
 public:
@@ -28,6 +29,7 @@ public:
     virtual std::any visitVariableExpr(const Variable& expr) = 0;
     virtual std::any visitAssignExpr(const Assign& expr) = 0;
     virtual std::any visitLogicalExpr(const Logical& expr) = 0;
+    virtual std::any visitCallExpr(const Call& expr) = 0;
 
     virtual ~ExprVisitor() = default;
 };
@@ -127,4 +129,17 @@ public:
     std::unique_ptr<Expr> left;
     Token op;
     std::unique_ptr<Expr> right;
+};
+
+class Call : public Expr {
+public:
+    Call(std::unique_ptr<Expr> callee,
+        Token paren,
+        std::vector<std::unique_ptr<Expr>> arguments);
+
+    std::any accept(ExprVisitor& visitor)const override;
+
+    std::unique_ptr<Expr> callee;
+    Token paren;
+    std::vector<std::unique_ptr<Expr>> arguments;
 };

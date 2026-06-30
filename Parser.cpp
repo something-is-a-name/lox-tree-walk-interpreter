@@ -356,6 +356,7 @@ std::unique_ptr<Expr> Parser::factor() {
 
 }
 
+
 std::unique_ptr<Expr> Parser::unary() {
 
 	if (match({ BANG, MINUS })) {
@@ -366,6 +367,37 @@ std::unique_ptr<Expr> Parser::unary() {
 
 	return primary();
 
+}
+
+std::unique_ptr<Expr> Parser::call() {
+	auto expr = primary();
+
+	while (true) {
+		if (match({ LEFT_PAREN })) {
+			expr = finishCall(*expr);
+		}
+		else {
+			break;
+		}
+	}
+
+	return expr;
+}
+
+std::unique_ptr<Expr> Parser::finishCall(const Expr& callee) {
+	std::vector<std::unique_ptr<Expr>> arguments {};
+	if (!check({ RIGHT_PAREN })) { // Check for zero arguments
+		do {
+			if (arguments.size() >= 255) {
+				Lox::error(peek(), "Can't have more than 255 arguments");
+			}
+			arguments.push_back(expression());
+		} while (match({ COMMA }));
+	}
+
+	Token paren = consume(RIGHT_PAREN, "Expected ')' after arguments.");
+
+	return std::make_unique<Call>(callee, paren, arguments);
 }
 
 std::unique_ptr<Expr> Parser::primary() {
@@ -404,3 +436,5 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
 
 	return statements;
 }
+
+

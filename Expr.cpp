@@ -90,3 +90,15 @@ Logical::Logical(std::unique_ptr<Expr> left,
 std::any Logical::accept(ExprVisitor& visitor)const {
 	return visitor.visitLogicalExpr(*this);
 }
+
+
+// Call
+
+Call::Call(std::unique_ptr<Expr> callee,
+	Token paren,
+	std::vector<std::unique_ptr<Expr>> arguments) :
+	callee(std::move(callee)), paren(std::move(paren)), arguments(std::move(arguments)) {}
+
+std::any Call::accept(ExprVisitor& visitor) const {
+	return visitor.visitCallExpr(*this);
+}

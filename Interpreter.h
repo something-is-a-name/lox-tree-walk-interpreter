@@ -4,6 +4,7 @@
 #include "Stmt.h"
 #include "Environment.h"
 #include <sstream>
+#include "LoxCallable.h"
 
 class Lox; 
 
@@ -33,6 +34,8 @@ public:
 
 	std::any visitLogicalExpr(const Logical& expr) override;
 
+	std::any visitCallExpr(const Call& expr) override;
+
 	std::any visitExpressionStmt(const Expression& stmt) override;
 
 	std::any visitPrintStmt(const Print& stmt) override;
@@ -44,6 +47,8 @@ public:
 	std::any visitIfStmt(const If& stmt) override;
 
 	std::any visitWhileStmt(const While& stmt) override;
+
+
 
 	void executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment);
 

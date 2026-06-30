@@ -61,3 +61,12 @@ While::While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body) :
 std::any While::accept(StmtVisitor& visitor)const {
 	return visitor.visitWhileStmt(*this);
 }
+
+// Function
+
+Function::Function(Token name, std::vector<std::unique_ptr<Expr>> params, std::vector<std::unique_ptr<Stmt>> body):
+	name(std::move(name)), params(std::move(params)), body(std::move(body)) {}
+
+std::any Function::accept(StmtVisitor& visitor) const {
+	return visitor.visitFunctionStmt(*this);
+}

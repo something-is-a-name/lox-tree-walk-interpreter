@@ -11,6 +11,7 @@ class Print;
 class Var;
 class If;
 class While;
+class Function;
 
 
 class StmtVisitor {
@@ -21,6 +22,7 @@ public:
     virtual std::any visitVarStmt(const Var& stmt) = 0;
     virtual std::any visitIfStmt(const If& stmt) = 0;
     virtual std::any visitWhileStmt(const While& stmt) = 0;
+    virtual std::any visitFunctionStmt(const Function& stmt) = 0;
 
     virtual ~StmtVisitor() = default;
 };
@@ -91,4 +93,17 @@ public:
 
     std::unique_ptr<Expr> condition;
     std::unique_ptr<Stmt> body;
+};
+
+
+class Function : public Stmt {
+public:
+    Function(Token name, std::vector<std::unique_ptr<Expr>> params, std::vector<std::unique_ptr<Stmt>> body);
+
+    std::any accept(StmtVisitor& visitor) const  override;
+
+    Token name;
+    std::vector<std::unique_ptr<Expr>> params;
+    std::vector<std::unique_ptr<Stmt>> body;
+
 };

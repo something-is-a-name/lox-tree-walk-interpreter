@@ -132,6 +132,7 @@
     <ClCompile Include="Expr.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="Lox.cpp" />
+    <ClCompile Include="LoxCallable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="RuntimeError.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="Expr.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="Lox.h" />
+    <ClInclude Include="LoxCallable.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="RuntimeError.h" />
     <ClInclude Include="Scanner.h" />

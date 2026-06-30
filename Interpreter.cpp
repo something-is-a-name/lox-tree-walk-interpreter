@@ -133,6 +133,30 @@ std::any Interpreter::visitLogicalExpr(const Logical& expr) {
 	return evaluate(*expr.right);
 }
 
+std::any Interpreter::visitCallExpr(const Call& expr) {
+	std::any callee = evaluate(*expr.callee);
+
+	std::vector<std::any> arguments {};
+	for (auto& e : expr.arguments) {
+		arguments.push_back(evaluate(*e));
+	}
+	auto* function = std::any_cast<LoxCallable*>(&callee);
+
+	if (!function) {
+		throw RuntimeError(expr.paren,"Can only call functions and classes.");
+	}
+
+	if ((*function)->arity() != arguments.size()) {
+		throw RuntimeError(
+			expr.paren,
+			"Expected " + std::to_string((*function)->arity()) +
+			" arguments but got " + std::to_string(arguments.size()) + "."
+		);
+	}
+
+	return (*function)->call(*this, arguments);
+}
+
 
 std::any Interpreter::evaluate(const Expr& expr) {
 	return expr.accept(*this);
