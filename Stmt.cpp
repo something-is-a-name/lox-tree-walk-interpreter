@@ -64,7 +64,7 @@ std::any While::accept(StmtVisitor& visitor)const {
 
 // Function
 
-Function::Function(Token name, std::vector<std::unique_ptr<Expr>> params, std::vector<std::unique_ptr<Stmt>> body):
+Function::Function(Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body):
 	name(std::move(name)), params(std::move(params)), body(std::move(body)) {}
 
 std::any Function::accept(StmtVisitor& visitor) const {

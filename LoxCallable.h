@@ -1,8 +1,11 @@
 #pragma once
 #include <any>
 #include <vector>
+#include <chrono>
+#include <string>
 
 class Interpreter; // forward declaration
+class ClockCallable;
 
 class LoxCallable {
 public:
@@ -11,6 +14,18 @@ public:
     // how many arguments it expects
     virtual int arity() const = 0;
 
+    virtual std::string toString() const = 0;
+
     virtual std::any call(Interpreter& interpreter,
-        const std::vector<std::any>& arguments) = 0;
+        const std::vector<std::any> arguments) = 0;
+};
+
+class ClockCallable : public LoxCallable {
+public:
+    int arity() const override;
+
+    std::any call(Interpreter& interpreter,
+        const std::vector<std::any> arguments) override;
+
+    std::string toString() const override;
 };

@@ -46,6 +46,8 @@ private:
 
 	std::unique_ptr<Stmt> expressionStatement();
 
+	std::unique_ptr<Function> function(std::string kind);
+
 	std::unique_ptr<Stmt> ifStatement();
 
 	std::unique_ptr<Stmt> whileStatement();
@@ -80,7 +82,7 @@ private:
 
 	std::unique_ptr<Expr> call();
 
-	std::unique_ptr<Expr> finishCall(const Expr& callee);
+	std::unique_ptr<Expr> finishCall(std::unique_ptr<Expr> callee);
 
 	std::unique_ptr<Expr> unary();
 	

@@ -2,7 +2,14 @@
 #include "Lox.h"
 
 Interpreter::Interpreter() {
-	environment = new Environment(nullptr);
+	globals = new Environment(nullptr);
+	environment = globals;
+
+	globals->define("clock", std::make_shared<ClockCallable>());
+}
+
+Environment* Interpreter::getGlobals() const {
+	return globals;
 }
 
 void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>>& statements) {
@@ -217,6 +224,14 @@ std::any Interpreter::visitWhileStmt(const While& stmt) {
 		execute(*stmt.body);
 		condition = evaluate(*stmt.condition);
 	}
+
+	return nullptr;
+
+}
+
+std::any Interpreter::visitFunctionStmt(const Function& stmt) {
+	LoxFunction function { stmt };
+	environment->define(stmt.name.lexeme, function);
 
 	return nullptr;
 

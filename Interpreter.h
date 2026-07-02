@@ -4,7 +4,7 @@
 #include "Stmt.h"
 #include "Environment.h"
 #include <sstream>
-#include "LoxCallable.h"
+#include "LoxFunction.h"
 
 class Lox; 
 
@@ -15,6 +15,8 @@ public:
 	Interpreter();
 
 	void interpret(const std::vector<std::unique_ptr<Stmt>>& statements);
+
+	Environment* getGlobals() const;
 
 	std::any visitLiteralExpr(const Literal& expr) override;
 
@@ -48,12 +50,15 @@ public:
 
 	std::any visitWhileStmt(const While& stmt) override;
 
+	std::any visitFunctionStmt(const Function& stmt) override;
+
 
 
 	void executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment);
 
 private:
 
+	Environment* globals;
 	Environment* environment;
 
 	std::any evaluate(const Expr& expr);

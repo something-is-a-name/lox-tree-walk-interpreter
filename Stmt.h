@@ -98,12 +98,12 @@ public:
 
 class Function : public Stmt {
 public:
-    Function(Token name, std::vector<std::unique_ptr<Expr>> params, std::vector<std::unique_ptr<Stmt>> body);
+    Function(Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body);
 
     std::any accept(StmtVisitor& visitor) const  override;
 
     Token name;
-    std::vector<std::unique_ptr<Expr>> params;
+    std::vector<Token> params;
     std::vector<std::unique_ptr<Stmt>> body;
 
 };

@@ -186,10 +186,7 @@ std::unique_ptr<Stmt> Parser::forStatement() {
 
 	return body;
 
-
-
 }
-
 
 std::unique_ptr<Stmt> Parser::expressionStatement() {
 	auto expr = expression();
@@ -197,6 +194,27 @@ std::unique_ptr<Stmt> Parser::expressionStatement() {
 
 	return std::make_unique<Expression>(std::move(expr));
 
+}
+
+std::unique_ptr<Function> Parser::function(std::string kind) {
+	Token name = consume(IDENTIFIER, "Expected " + kind + ".");
+	consume(LEFT_PAREN, "Expecteded '(' after " + kind + "name.");
+
+	std::vector<Token> parameters {};
+	if (!check({ RIGHT_PAREN })) { // Check for zero arguments
+		do {
+			if (parameters.size() >= 255) {
+				Lox::error(peek(), "Can't have more than 255 parameters");
+			}
+			parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+		} while (match({ COMMA }));
+	}
+
+	consume(RIGHT_PAREN, "Expected ')' after parameters.");
+	consume(LEFT_BRACE, "Expected '{' before" + kind + "body.");
+
+	std::vector<std::unique_ptr<Stmt>> body = block();
+	return std::make_unique<Function>(std::move(name), std::move(parameters), std::move(body));
 }
 
 std::vector<std::unique_ptr<Stmt>> Parser::block() {
@@ -260,7 +278,8 @@ std::unique_ptr<Expr> Parser::andExpr() {
 
 std::unique_ptr<Stmt> Parser::declaration() {
 	try {
-		if (match({ VAR })) return varDeclaration();
+		if( match({ FUN })) return function("function");
+		if (match({ VAR })) return varDeclaration();  
 
 		return statement();
 	}
@@ -374,7 +393,7 @@ std::unique_ptr<Expr> Parser::call() {
 
 	while (true) {
 		if (match({ LEFT_PAREN })) {
-			expr = finishCall(*expr);
+			expr = finishCall(std::move(expr));
 		}
 		else {
 			break;
@@ -384,7 +403,7 @@ std::unique_ptr<Expr> Parser::call() {
 	return expr;
 }
 
-std::unique_ptr<Expr> Parser::finishCall(const Expr& callee) {
+std::unique_ptr<Expr> Parser::finishCall(std::unique_ptr<Expr> callee) {
 	std::vector<std::unique_ptr<Expr>> arguments {};
 	if (!check({ RIGHT_PAREN })) { // Check for zero arguments
 		do {
@@ -397,7 +416,7 @@ std::unique_ptr<Expr> Parser::finishCall(const Expr& callee) {
 
 	Token paren = consume(RIGHT_PAREN, "Expected ')' after arguments.");
 
-	return std::make_unique<Call>(callee, paren, arguments);
+	return std::make_unique<Call>(std::move(callee), std::move(paren), std::move(arguments));
 }
 
 std::unique_ptr<Expr> Parser::primary() {
