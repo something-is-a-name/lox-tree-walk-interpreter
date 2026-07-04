@@ -70,3 +70,13 @@ Function::Function(Token name, std::vector<Token> params, std::vector<std::uniqu
 std::any Function::accept(StmtVisitor& visitor) const {
 	return visitor.visitFunctionStmt(*this);
 }
+
+// Return
+
+
+ReturnStmt::ReturnStmt(Token keyword, std::unique_ptr<Expr> value) :
+	keyword(std::move(keyword)), value(std::move(value))  {}
+
+std::any ReturnStmt::accept(StmtVisitor& visitor)const {
+	return visitor.visitReturnStmt(*this);
+}

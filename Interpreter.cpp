@@ -143,14 +143,15 @@ std::any Interpreter::visitLogicalExpr(const Logical& expr) {
 std::any Interpreter::visitCallExpr(const Call& expr) {
 	std::any callee = evaluate(*expr.callee);
 
-	std::vector<std::any> arguments {};
+	std::vector<std::any> arguments;
 	for (auto& e : expr.arguments) {
 		arguments.push_back(evaluate(*e));
 	}
-	auto* function = std::any_cast<LoxCallable*>(&callee);
+
+	auto function = std::any_cast<std::shared_ptr<LoxCallable>>(&callee);
 
 	if (!function) {
-		throw RuntimeError(expr.paren,"Can only call functions and classes.");
+		throw RuntimeError(expr.paren, "Can only call functions and classes.");
 	}
 
 	if ((*function)->arity() != arguments.size()) {
@@ -181,7 +182,7 @@ std::any Interpreter::visitExpressionStmt(const Expression& stmt) {
 
 std::any Interpreter::visitPrintStmt(const Print& stmt) {
 	auto value = evaluate(*stmt.expression);
-	std::cout << stringify(value);
+	std::cout << stringify(value) << "\n";
 	
 	return nullptr;
 }
@@ -198,9 +199,8 @@ std::any Interpreter::visitVarStmt(const Var& stmt) {
 
 
 std::any Interpreter::visitBlockStmt(const Block& stmt) {
-	Environment newEnvironment(this->environment);
-	executeBlock(stmt.statements, &newEnvironment);
-
+	Environment environment(this->environment);
+	executeBlock(stmt.statements, &environment);
 	return nullptr;
 }
 
@@ -230,11 +230,19 @@ std::any Interpreter::visitWhileStmt(const While& stmt) {
 }
 
 std::any Interpreter::visitFunctionStmt(const Function& stmt) {
-	LoxFunction function { stmt };
-	environment->define(stmt.name.lexeme, function);
+	auto function = std::make_shared<LoxFunction>(stmt);
+
+	environment->define(stmt.name.lexeme,
+		std::static_pointer_cast<LoxCallable>(function));
 
 	return nullptr;
+}
 
+std::any Interpreter::visitReturnStmt(const ReturnStmt& stmt) {
+	std::any value {};
+	if (stmt.value != nullptr)  value = evaluate(*stmt.value);
+
+	throw Return(std::move(value));
 }
 
 void Interpreter::executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment) {

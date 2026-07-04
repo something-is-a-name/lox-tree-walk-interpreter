@@ -12,6 +12,7 @@ class Var;
 class If;
 class While;
 class Function;
+class ReturnStmt;
 
 
 class StmtVisitor {
@@ -23,6 +24,7 @@ public:
     virtual std::any visitIfStmt(const If& stmt) = 0;
     virtual std::any visitWhileStmt(const While& stmt) = 0;
     virtual std::any visitFunctionStmt(const Function& stmt) = 0;
+    virtual std::any visitReturnStmt(const ReturnStmt& stmt) = 0;
 
     virtual ~StmtVisitor() = default;
 };
@@ -106,4 +108,14 @@ public:
     std::vector<Token> params;
     std::vector<std::unique_ptr<Stmt>> body;
 
+};
+
+class ReturnStmt : public Stmt {
+public:
+    ReturnStmt(Token keyword, std::unique_ptr<Expr> value);
+
+    std::any accept(StmtVisitor& visitor)const   override;
+
+    Token keyword;
+    std::unique_ptr<Expr> value;
 };

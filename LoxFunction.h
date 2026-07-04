@@ -1,6 +1,7 @@
 #pragma once
 #include "LoxCallable.h"
 #include <memory>
+#include "Return.h"
 
 class Interpreter; 
 
@@ -9,7 +10,7 @@ class Function;
 
 class LoxFunction : public LoxCallable {
 public:
-	LoxFunction(const Function& declaration);
+	explicit LoxFunction(const Function& declaration);
 
 	int arity() const override;
 

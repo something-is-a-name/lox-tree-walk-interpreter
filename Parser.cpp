@@ -76,6 +76,7 @@ std::unique_ptr<Stmt> Parser::statement() {
 	if (match({ FOR })) return forStatement();
 	if (match({ IF }))  return ifStatement();
 	if (match({ PRINT })) return printStatement();
+	if (match({ RETURN })) return returnStatement();
 	if (match({ WHILE })) return whileStatement();
 	if (match({ LEFT_BRACE })) return std::make_unique<Block>(block());
 
@@ -194,6 +195,17 @@ std::unique_ptr<Stmt> Parser::expressionStatement() {
 
 	return std::make_unique<Expression>(std::move(expr));
 
+}
+
+std::unique_ptr<Stmt> Parser::returnStatement() {
+	Token keyword = previous();
+	std::unique_ptr<Expr> value {};
+	if (!check(SEMICOLON)) {
+		value = expression();
+	}
+
+	consume(SEMICOLON, "Expected ';' after return value.");
+	return std::make_unique<ReturnStmt>(std::move(keyword), std::move(value));
 }
 
 std::unique_ptr<Function> Parser::function(std::string kind) {
@@ -384,7 +396,7 @@ std::unique_ptr<Expr> Parser::unary() {
 		return  std::make_unique<Unary>(op, std::move(right));
 	}
 
-	return primary();
+	return call();
 
 }
 

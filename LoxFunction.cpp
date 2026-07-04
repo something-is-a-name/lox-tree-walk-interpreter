@@ -13,14 +13,21 @@ std::string LoxFunction::toString() const {
 	return "<fn" + declaration->name.lexeme + ">";
 }
 
-std::any LoxFunction::call(Interpreter& interpreter, std::vector<std::any> arguments) {
-	Environment* environment{ interpreter.getGlobals()};
+std::any LoxFunction::call(Interpreter& interpreter,
+    std::vector<std::any> arguments) {
 
-	for (int i = 0; i < declaration->params.size(); i++) {
-		environment->define(declaration->params[i].lexeme, arguments[i]);
-	}
+    Environment functionEnv(interpreter.getGlobals());
 
-	interpreter.executeBlock(declaration->body, environment);
-	return nullptr;
+    for (int i = 0; i < declaration->params.size(); i++) {
+        functionEnv.define(declaration->params[i].lexeme, arguments[i]);
+    }
 
+    try {
+        interpreter.executeBlock(declaration->body, &functionEnv);
+    }
+    catch (const Return& returnValue) {
+        return returnValue.value;
+    }
+
+    return nullptr;
 }

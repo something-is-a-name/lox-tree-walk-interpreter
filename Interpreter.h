@@ -5,6 +5,7 @@
 #include "Environment.h"
 #include <sstream>
 #include "LoxFunction.h"
+#include "Return.h"
 
 class Lox; 
 
@@ -51,6 +52,8 @@ public:
 	std::any visitWhileStmt(const While& stmt) override;
 
 	std::any visitFunctionStmt(const Function& stmt) override;
+
+	std::any visitReturnStmt(const ReturnStmt& stmt) override;
 
 
 

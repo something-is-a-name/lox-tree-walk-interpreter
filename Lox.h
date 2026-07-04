@@ -38,4 +38,6 @@ private:
 
      static Interpreter interpreter;
 
+     inline static std::vector<std::unique_ptr<Stmt>> allStatements;
+
 };
