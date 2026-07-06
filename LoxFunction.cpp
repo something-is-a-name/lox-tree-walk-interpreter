@@ -2,8 +2,10 @@
 #include "Interpreter.h"
 #include "Stmt.h"
 
-LoxFunction::LoxFunction(const Function& declaration) :
-	declaration(&declaration) {}
+LoxFunction::LoxFunction(const Function& declaration,
+    Environment* closure)
+    : declaration(&declaration), closure(std::move(closure))
+{}
 
 int LoxFunction::arity() const {
 	return declaration->params.size();
@@ -16,7 +18,7 @@ std::string LoxFunction::toString() const {
 std::any LoxFunction::call(Interpreter& interpreter,
     std::vector<std::any> arguments) {
 
-    Environment functionEnv(interpreter.getGlobals());
+    Environment functionEnv(*closure);
 
     for (int i = 0; i < declaration->params.size(); i++) {
         functionEnv.define(declaration->params[i].lexeme, arguments[i]);

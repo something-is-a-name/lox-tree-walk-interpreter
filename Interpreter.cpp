@@ -230,7 +230,7 @@ std::any Interpreter::visitWhileStmt(const While& stmt) {
 }
 
 std::any Interpreter::visitFunctionStmt(const Function& stmt) {
-	auto function = std::make_shared<LoxFunction>(stmt);
+	auto function = std::make_shared<LoxFunction>(stmt, environment);
 
 	environment->define(stmt.name.lexeme,
 		std::static_pointer_cast<LoxCallable>(function));

@@ -2,6 +2,7 @@
 #include "LoxCallable.h"
 #include <memory>
 #include "Return.h"
+#include "Environment.h"
 
 class Interpreter; 
 
@@ -10,7 +11,8 @@ class Function;
 
 class LoxFunction : public LoxCallable {
 public:
-	explicit LoxFunction(const Function& declaration);
+	LoxFunction(const Function& declaration,
+		Environment* closure);
 
 	int arity() const override;
 
@@ -19,4 +21,7 @@ public:
 	std::any call(Interpreter& interpreter, std::vector<std::any> arguments) override;
 private:
 	const Function* declaration;
+
+	Environment* closure;
 };
+
