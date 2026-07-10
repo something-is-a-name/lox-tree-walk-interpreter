@@ -57,6 +57,9 @@
     <ClCompile Include="Return.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Resolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TokenType.h">
@@ -96,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Return.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resolver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

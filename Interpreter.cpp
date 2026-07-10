@@ -117,12 +117,20 @@ std::any Interpreter::visitTernaryExpr(const Ternary& expr) {
 }
 
 std::any Interpreter::visitVariableExpr(const Variable& expr) {
-	return environment->get(expr.name);
+	return lookUpVariable(expr.name, expr);
 }
 
 std::any Interpreter::visitAssignExpr(const Assign& expr) {
 	std::any value = evaluate(*expr.value);
-	environment->assign(expr.name, value);
+
+	auto it = locals.find(&expr);
+	if (it != locals.end()) {
+		int distance = it->second;
+		environment->assignAt(distance, expr.name, value);
+	}
+	else {
+		globals->assign(expr.name, value);
+	}
 	return value;
 }
 
@@ -166,8 +174,26 @@ std::any Interpreter::visitCallExpr(const Call& expr) {
 }
 
 
+void Interpreter::resolve(const Expr& expr, int depth)
+{
+	locals.emplace(&expr, depth);
+}
+
 std::any Interpreter::evaluate(const Expr& expr) {
 	return expr.accept(*this);
+}
+
+std::any Interpreter::lookUpVariable(Token name, const Expr& expr)
+{
+	auto it = locals.find(&expr);
+	if (it != locals.end()) {
+		int distance = it->second;
+		return environment->getAt(distance, name.lexeme);
+	}
+	else {
+		return globals->get(name);
+	}
+	
 }
 
 void Interpreter::execute(const Stmt& stmt) {

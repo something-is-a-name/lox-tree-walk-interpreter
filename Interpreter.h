@@ -1,3 +1,4 @@
+#pragma once
 #include "Expr.h"
 #include "RuntimeError.h"
 #include <iostream>
@@ -56,13 +57,18 @@ public:
 	std::any visitReturnStmt(const ReturnStmt& stmt) override;
 
 
-
 	void executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment);
+
+	void resolve(const Expr& expr, int depth);
 
 private:
 
 	Environment* globals;
 	Environment* environment;
+
+	std::map<const Expr*, int > locals {};
+
+	std::any lookUpVariable(Token name, const Expr& expr);
 
 	std::any evaluate(const Expr& expr);
 

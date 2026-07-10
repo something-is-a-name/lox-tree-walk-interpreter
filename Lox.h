@@ -8,10 +8,10 @@
 #include "Token.h"
 #include "RuntimeError.h"
 
-#include "Scanner.h"
-#include "Parser.h"
+
 
 class Interpreter;
+class Stmt;
 
 class Lox {
 public:
@@ -37,7 +37,6 @@ private:
     inline static bool hadRuntimeError{ true };
 
      static Interpreter interpreter;
-
-     inline static std::vector<std::unique_ptr<Stmt>> allStatements;
+     static std::vector<std::unique_ptr<Stmt>> allStatements;
 
 };

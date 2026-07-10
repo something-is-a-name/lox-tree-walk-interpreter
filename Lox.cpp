@@ -1,10 +1,15 @@
 #pragma once
 
 
-#include "Lox.h"
 #include "Interpreter.h"
+#include "Resolver.h"
+#include "Scanner.h"
+#include "Parser.h"
+#include "Stmt.h"
+
 
 Interpreter Lox::interpreter = Interpreter();
+std::vector<std::unique_ptr<Stmt>> Lox::allStatements{};
 
 void Lox::runFile(const std::string& path) {
     std::ifstream input(path, std::ios::binary);
@@ -55,6 +60,9 @@ void Lox::runPrompt() {
      Parser parser = Parser(tokens);
      std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
      if (hadError) return;
+
+     Resolver resolver(interpreter);
+     resolver.resolve(statements);
 
      interpreter.interpret(statements);
 

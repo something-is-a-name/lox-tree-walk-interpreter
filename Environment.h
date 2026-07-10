@@ -12,9 +12,15 @@ public:
 
 	void define(std::string name, std::any value);
 
+	Environment ancestor(int distance);
+
 	std::any get(Token name);
 
+	std::any getAt(int distance, std::string name);
+
 	void assign(Token name, std::any value);
+
+	void assignAt(int distance, Token name, std::any value);
 
 private:
 	std::map<std::string, std::any> values {};
