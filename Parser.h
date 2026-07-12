@@ -90,6 +90,8 @@ private:
 	
 	std::unique_ptr<Expr> primary();
 
+	std::unique_ptr<Stmt> classDeclaration();
+
 
 public:
 	Parser(std::vector<Token> tokens);

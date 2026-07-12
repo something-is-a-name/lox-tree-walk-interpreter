@@ -62,7 +62,10 @@ void Lox::runPrompt() {
      if (hadError) return;
 
      Resolver resolver(interpreter);
+
      resolver.resolve(statements);
+
+     if (hadError) return;
 
      interpreter.interpret(statements);
 

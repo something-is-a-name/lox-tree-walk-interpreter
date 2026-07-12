@@ -80,3 +80,13 @@ ReturnStmt::ReturnStmt(Token keyword, std::unique_ptr<Expr> value) :
 std::any ReturnStmt::accept(StmtVisitor& visitor)const {
 	return visitor.visitReturnStmt(*this);
 }
+
+// Class
+
+Class::Class(Token name, std::unique_ptr<Variable> superclass, std::vector<std::unique_ptr<Function>> methods) :
+	name(std::move(name)), superclass(std::move(superclass)), methods(std::move(methods)) {}
+
+std::any Class::accept(StmtVisitor& visitor) const
+{
+	return visitor.visitClassStmt(*this);
+}

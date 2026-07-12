@@ -174,6 +174,14 @@ std::any Interpreter::visitCallExpr(const Call& expr) {
 }
 
 
+std::any Interpreter::visitClassStmt(const Class& stmt)
+{
+	environment->define(stmt.name.lexeme, nullptr);
+	LoxClass klass(stmt.name.lexeme);
+	environment->assign(stmt.name, klass);
+	return nullptr;
+}
+
 void Interpreter::resolve(const Expr& expr, int depth)
 {
 	locals.emplace(&expr, depth);

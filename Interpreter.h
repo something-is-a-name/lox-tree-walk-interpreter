@@ -7,6 +7,7 @@
 #include <sstream>
 #include "LoxFunction.h"
 #include "Return.h"
+#include "LoxClass.h"
 
 class Lox; 
 
@@ -55,6 +56,8 @@ public:
 	std::any visitFunctionStmt(const Function& stmt) override;
 
 	std::any visitReturnStmt(const ReturnStmt& stmt) override;
+
+	std::any visitClassStmt(const Class& stmt) override;
 
 
 	void executeBlock(const std::vector<std::unique_ptr<Stmt>>&  statements, Environment* environment);

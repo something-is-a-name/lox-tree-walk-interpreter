@@ -9,7 +9,7 @@ Resolver::Resolver(Interpreter& interpreter) :
 std::any Resolver::visitBlockStmt(const Block& stmt)
 {
 	beginScope();
-	resolve(std::move(stmt.statements));
+	resolve(stmt.statements);
 	endScope();
 	return nullptr;
 }
@@ -32,13 +32,17 @@ std::any Resolver::visitFunctionStmt(const Function& stmt)
 	declare(stmt.name);
 	define(stmt.name);
 
-	resolveFunction(stmt);
+	resolveFunction(stmt, FunctionType::FUNCTION);
 
 	return nullptr;
 }
 
 std::any Resolver::visitReturnStmt(const ReturnStmt& stmt)
 {
+	if (currentFunction == FunctionType::NONE) {
+		Lox::error(stmt.keyword, "Can't return from top level code");
+	}
+
 	if (stmt.value != nullptr) {
 		resolve(*stmt.value);
 	}
@@ -70,6 +74,13 @@ std::any Resolver::visitPrintStmt(const Print& stmt)
 std::any Resolver::visitExpressionStmt(const Expression& stmt)
 {
 	resolve(*stmt.expression);
+	return nullptr;
+}
+
+std::any Resolver::visitClassStmt(const Class& stmt)
+{
+	declare(stmt.name);
+	define(stmt.name);
 	return nullptr;
 }
 
@@ -190,6 +201,10 @@ void Resolver::declare(Token name)
 
 	std::map<std::string, bool> scope = scopes.back();
 
+	if (scope.contains(name.lexeme)) {
+		Lox::error(name, "Already a variable with this name is this scope.");
+	}
+
 	scope.emplace(name.lexeme, false);
 }
 
@@ -209,8 +224,11 @@ void Resolver::resolveLocal(const Expr& expr, Token name)
 	}
 }
 
-void Resolver::resolveFunction(const Function& function)
+void Resolver::resolveFunction(const Function& function, FunctionType type)
 {
+	FunctionType enclosingFunction = currentFunction;
+	currentFunction = type;
+
 	beginScope();
 	for (Token param : function.params) {
 		declare(param);
@@ -218,6 +236,8 @@ void Resolver::resolveFunction(const Function& function)
 	}
 	resolve(function.body);
 	endScope();
+
+	currentFunction = enclosingFunction;
 }
 
 

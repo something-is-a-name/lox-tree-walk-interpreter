@@ -27,6 +27,8 @@ public:
 
 	std::any visitExpressionStmt(const Expression& stmt) override;
 
+	std::any visitClassStmt(const Class& stmt) override;
+
 	std::any visitVariableExpr(const Variable& expr) override;
 
 	std::any visitAssignExpr(const Assign& expr) override;
@@ -54,6 +56,12 @@ public:
 
 private:
 
+	enum FunctionType {
+		NONE,
+		FUNCTION
+	};
+
+	FunctionType currentFunction = FunctionType::NONE;
 
 	
 	void beginScope();
@@ -63,7 +71,7 @@ private:
 	void define(Token name);
 
 	void resolveLocal(const Expr& expr, Token name);
-	void resolveFunction(const Function& function);
+	void resolveFunction(const Function& function, FunctionType type);
 
 	 Interpreter& interpreter;
 

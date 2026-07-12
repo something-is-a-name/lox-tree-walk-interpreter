@@ -290,6 +290,7 @@ std::unique_ptr<Expr> Parser::andExpr() {
 
 std::unique_ptr<Stmt> Parser::declaration() {
 	try {
+		if (match({ CLASS })) return classDeclaration();
 		if( match({ FUN })) return function("function");
 		if (match({ VAR })) return varDeclaration();  
 
@@ -451,6 +452,21 @@ std::unique_ptr<Expr> Parser::primary() {
 	}
 
 	throw error(peek(), "Expected expression.");
+}
+
+std::unique_ptr<Stmt> Parser::classDeclaration()
+{
+	Token name = consume(IDENTIFIER, "Expected class name.");
+	consume(LEFT_BRACE, "Expected '{' before class body.");
+
+	std::vector<std::unique_ptr<Function>> methods {};
+
+	while (!check(RIGHT_BRACE) && !isAtEnd()) {
+		methods.push_back(function("method"));
+	}
+	consume(RIGHT_BRACE, "Expected '}' after class body.");
+
+	return std::make_unique<Class>(name, methods);
 }
 
 

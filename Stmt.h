@@ -13,6 +13,7 @@ class If;
 class While;
 class Function;
 class ReturnStmt;
+class Class;
 
 
 class StmtVisitor {
@@ -25,6 +26,7 @@ public:
     virtual std::any visitWhileStmt(const While& stmt) = 0;
     virtual std::any visitFunctionStmt(const Function& stmt) = 0;
     virtual std::any visitReturnStmt(const ReturnStmt& stmt) = 0;
+    virtual std::any visitClassStmt(const Class& stmt) = 0;
 
     virtual ~StmtVisitor() = default;
 };
@@ -119,3 +121,15 @@ public:
     Token keyword;
     std::unique_ptr<Expr> value;
 };
+
+class Class : public Stmt {
+public:
+    Class(Token name, std::unique_ptr<Variable> superclass, std::vector<std::unique_ptr<Function>> methods);
+
+    std::any accept(StmtVisitor& visitor)const  override;
+
+    Token name;
+    std::unique_ptr<Variable> superclass;
+    std::vector<std::unique_ptr<Function>> methods;
+};
+
