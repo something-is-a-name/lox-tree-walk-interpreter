@@ -17,6 +17,7 @@ class Variable;
 class Assign;
 class Logical;
 class Call;
+class Get;
 
 class ExprVisitor {
 public:
@@ -30,6 +31,7 @@ public:
     virtual std::any visitAssignExpr(const Assign& expr) = 0;
     virtual std::any visitLogicalExpr(const Logical& expr) = 0;
     virtual std::any visitCallExpr(const Call& expr) = 0;
+    virtual std::any visitGetExpr(const Get& expr) = 0;
 
     virtual ~ExprVisitor() = default;
 };
@@ -142,4 +144,14 @@ public:
     std::unique_ptr<Expr> callee;
     Token paren;
     std::vector<std::unique_ptr<Expr>> arguments;
+};
+
+class Get : public Expr {
+public:
+    Get(std::unique_ptr<Expr> object, Token name);
+
+    std::any accept(ExprVisitor& visitor)const override;
+
+    std::unique_ptr<Expr> object;
+    Token name;
 };

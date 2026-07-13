@@ -49,6 +49,8 @@ public:
 
 	std::any visitTernaryExpr(const Ternary& expr) override;
 
+	std::any visitGetExpr(const Get& expr) override;
+
 	void resolve(const std::vector<std::unique_ptr<Stmt>>& statements);
 	void resolve(const std::vector<std::unique_ptr<Expr>>& statements);
 	void resolve(const Stmt& stmt);

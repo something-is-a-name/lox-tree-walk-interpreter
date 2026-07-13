@@ -8,7 +8,7 @@
 #include "LoxFunction.h"
 #include "Return.h"
 #include "LoxClass.h"
-
+#include "LoxInstance.h"
 class Lox; 
 
 class Interpreter : public ExprVisitor, public StmtVisitor {
@@ -40,6 +40,8 @@ public:
 	std::any visitLogicalExpr(const Logical& expr) override;
 
 	std::any visitCallExpr(const Call& expr) override;
+
+	std::any visitGetExpr(const Get& expr) override;
 
 	std::any visitExpressionStmt(const Expression& stmt) override;
 

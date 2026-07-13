@@ -102,3 +102,14 @@ Call::Call(std::unique_ptr<Expr> callee,
 std::any Call::accept(ExprVisitor& visitor) const {
 	return visitor.visitCallExpr(*this);
 }
+
+// Get
+
+Get::Get(std::unique_ptr<Expr> object, Token name) :
+	object(std::move(object)), name(std::move(name))
+{}
+
+std::any Get::accept(ExprVisitor & visitor) const
+{
+	return visitor.visitGetExpr(*this);
+}

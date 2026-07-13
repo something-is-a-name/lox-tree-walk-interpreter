@@ -161,6 +161,12 @@ std::any Resolver::visitTernaryExpr(const Ternary& expr)
 	return nullptr;
 }
 
+std::any Resolver::visitGetExpr(const Get& expr)
+{
+	resolve(*expr.object);
+	return nullptr;
+}
+
 void Resolver::resolve(const std::vector<std::unique_ptr<Stmt>>& statements)
 {
 	for (const auto& statement : statements) {

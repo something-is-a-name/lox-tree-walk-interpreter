@@ -221,6 +221,18 @@ std::any Interpreter::visitPrintStmt(const Print& stmt) {
 	return nullptr;
 }
 
+std::any Interpreter::visitGetExpr(const Get& expr)
+{
+	std::any object = evaluate(*expr.object);
+	
+	if (object.type() == typeid(LoxInstance)) {
+		return std::any_cast<LoxInstance>(object.get(expr.name));
+	} 
+
+	throw new RuntimeError(expr.name, "Only instances have properties.");
+	return std::any();
+}
+
 std::any Interpreter::visitVarStmt(const Var& stmt) {
 	std::any value {};
 	if (stmt.initializer != nullptr) {
