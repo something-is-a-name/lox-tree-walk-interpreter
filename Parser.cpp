@@ -255,6 +255,9 @@ std::unique_ptr<Expr> Parser::assignment() {
 			Token name = variable->name;
 			return std::make_unique<Assign>(std::move(name), std::move(value));
 		}
+		else if (auto* get = dynamic_cast<Get*>(expr.get())) {
+			return std::make_unique<Set>(std::move(get->object), std::move(get->name), std::move(value));
+		}
 
 		Lox::error(equals, "Invalid assignment target.");
 		return expr;
@@ -444,6 +447,9 @@ std::unique_ptr<Expr> Parser::primary() {
 	if (match({ NUMBER, STRING })) {
 		return std::make_unique<Literal>(previous().literal);
 	}
+	if (match({ THIS })) {
+		return std::make_unique<This>(previous());
+	}
 
 	if (match({ IDENTIFIER })) {
 		return std::make_unique<Variable>(previous());
@@ -470,7 +476,7 @@ std::unique_ptr<Stmt> Parser::classDeclaration()
 	}
 	consume(RIGHT_BRACE, "Expected '}' after class body.");
 
-	return std::make_unique<Class>(name, methods);
+	return std::make_unique<Class>(std::move(name), std::move(methods));
 }
 
 

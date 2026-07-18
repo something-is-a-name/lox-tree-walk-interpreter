@@ -1,11 +1,15 @@
 #include "LoxClass.h"
+#include "LoxInstance.h"
 
-LoxClass::LoxClass(std::string name) :
-	name(std::move(name)) {}
+LoxClass::LoxClass(std::string name , std::map<std::string, LoxFunction> methods) :
+	name(std::move(name)), methods(std::move(methods)) {}
 
-int LoxClass::arity() const
+int LoxClass::arity() 
 {
-	return 0;
+    LoxFunction* initializer = findMethod("init");
+    if (initializer == nullptr) return 0;
+
+	return initializer->arity();
 }
 
 std::string LoxClass::toString() const
@@ -13,7 +17,26 @@ std::string LoxClass::toString() const
 	return name;
 }
 
+LoxFunction* LoxClass::findMethod(std::string name) 
+{
+    auto it = methods.find(name);
+    if (it != methods.end()) {
+        return &it->second;
+    }
+
+    return nullptr;
+}
+
 std::any LoxClass::call(Interpreter& interpreter, const std::vector<std::any> arguments)
 {
-	LoxInstance instance(*this);
+	LoxInstance instance(this);
+
+    LoxFunction* initializer = findMethod("init");
+    if (initializer != nullptr) {
+        initializer->bind(instance).call(interpreter, arguments);
+    }
+
+    return instance;
+
+    
 }

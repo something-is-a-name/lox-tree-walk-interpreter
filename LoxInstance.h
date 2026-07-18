@@ -1,23 +1,20 @@
 #pragma once
-#include "LoxClass.h"4
 #include "Token.h"
 #include <map>
 #include "RuntimeError.h"
 
+class LoxClass;
+
 class LoxInstance {
 public:
-	LoxInstance(LoxClass klass);
+	LoxInstance(LoxClass* klass);
 
 	std::string toString() const;
 
-	std::any get(Token name) {
-		if (fields.contains(name.lexeme)) {
-			return fields.at(name.lexeme);
-		}
+	std::any get(Token name);
 
-		throw new RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
-	}
+	void set(Token name, std::any value);
 private:
-	LoxClass klass;
+	LoxClass* klass;
 	std::map<std::string, std::any> fields {};
 };

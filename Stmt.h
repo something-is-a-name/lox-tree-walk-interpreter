@@ -124,12 +124,12 @@ public:
 
 class Class : public Stmt {
 public:
-    Class(Token name, std::unique_ptr<Variable> superclass, std::vector<std::unique_ptr<Function>> methods);
+    Class(Token name, std::vector<std::unique_ptr<Function>> methods);
 
     std::any accept(StmtVisitor& visitor)const  override;
 
     Token name;
-    std::unique_ptr<Variable> superclass;
+    //std::unique_ptr<Variable> superclass;
     std::vector<std::unique_ptr<Function>> methods;
 };
 

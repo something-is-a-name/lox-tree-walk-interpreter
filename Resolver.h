@@ -51,6 +51,12 @@ public:
 
 	std::any visitGetExpr(const Get& expr) override;
 
+	std::any visitSetExpr(const Set& expr) override;
+
+	std::any visitThisExpr(const This& expr) override;
+
+
+
 	void resolve(const std::vector<std::unique_ptr<Stmt>>& statements);
 	void resolve(const std::vector<std::unique_ptr<Expr>>& statements);
 	void resolve(const Stmt& stmt);
@@ -58,12 +64,20 @@ public:
 
 private:
 
-	enum FunctionType {
+	enum class FunctionType {
 		NONE,
-		FUNCTION
+		FUNCTION,
+		INITIAlIZER,
+		METHOD
+	};
+
+	enum class ClassType {
+		NONE,
+		CLASS
 	};
 
 	FunctionType currentFunction = FunctionType::NONE;
+	ClassType currentClass = ClassType::NONE;
 
 	
 	void beginScope();

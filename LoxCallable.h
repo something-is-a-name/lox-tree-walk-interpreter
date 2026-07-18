@@ -12,7 +12,7 @@ public:
     virtual ~LoxCallable() = default;
 
     // how many arguments it expects
-    virtual int arity() const = 0;
+    virtual int arity() = 0;
 
     virtual std::string toString() const = 0;
 
@@ -22,7 +22,7 @@ public:
 
 class ClockCallable : public LoxCallable {
 public:
-    int arity() const override;
+    int arity()  override;
 
     std::any call(Interpreter& interpreter,
         const std::vector<std::any> arguments) override;

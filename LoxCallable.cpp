@@ -1,7 +1,7 @@
 #include "LoxCallable.h"
 
 
-int ClockCallable::arity() const  {
+int ClockCallable::arity()   {
         return 0;
     }
 

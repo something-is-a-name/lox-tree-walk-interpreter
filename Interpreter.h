@@ -43,6 +43,10 @@ public:
 
 	std::any visitGetExpr(const Get& expr) override;
 
+	std::any visitSetExpr(const Set& expr) override;
+
+	std::any visitThisExpr(const This& expr) override;
+
 	std::any visitExpressionStmt(const Expression& stmt) override;
 
 	std::any visitPrintStmt(const Print& stmt) override;

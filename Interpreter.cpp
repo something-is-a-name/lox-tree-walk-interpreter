@@ -173,11 +173,21 @@ std::any Interpreter::visitCallExpr(const Call& expr) {
 	return (*function)->call(*this, arguments);
 }
 
+std::any Interpreter::visitThisExpr(const This& expr) {
+	return lookUpVariable(expr.keyword, expr);
+}
 
 std::any Interpreter::visitClassStmt(const Class& stmt)
 {
 	environment->define(stmt.name.lexeme, nullptr);
-	LoxClass klass(stmt.name.lexeme);
+
+	std::map<std::string, LoxFunction> methods {};
+	for (const std::unique_ptr<Function>& method : stmt.methods) {
+		LoxFunction function = LoxFunction(*method, environment, false);
+		methods.emplace((*method).name.lexeme, function);
+	}
+
+	LoxClass klass = LoxClass(stmt.name.lexeme, methods);
 	environment->assign(stmt.name, klass);
 	return nullptr;
 }
@@ -226,11 +236,24 @@ std::any Interpreter::visitGetExpr(const Get& expr)
 	std::any object = evaluate(*expr.object);
 	
 	if (object.type() == typeid(LoxInstance)) {
-		return std::any_cast<LoxInstance>(object.get(expr.name));
+		return std::any_cast<LoxInstance>(object).get(expr.name);
 	} 
 
 	throw new RuntimeError(expr.name, "Only instances have properties.");
 	return std::any();
+}
+
+std::any Interpreter::visitSetExpr(const Set& expr) {
+	std::any object = evaluate(*expr.object);
+
+	if (!(object.type() == typeid(LoxInstance))) {
+		throw new RuntimeError(expr.name, "Only instances have fields.");
+	}
+
+	std::any value = evaluate(*expr.value);
+	std::any_cast<LoxInstance>(object).set(expr.name, value);
+	return value;
+
 }
 
 std::any Interpreter::visitVarStmt(const Var& stmt) {
@@ -276,7 +299,7 @@ std::any Interpreter::visitWhileStmt(const While& stmt) {
 }
 
 std::any Interpreter::visitFunctionStmt(const Function& stmt) {
-	auto function = std::make_shared<LoxFunction>(stmt, environment);
+	auto function = std::make_shared<LoxFunction>(stmt, environment, false);
 
 	environment->define(stmt.name.lexeme,
 		std::static_pointer_cast<LoxCallable>(function));

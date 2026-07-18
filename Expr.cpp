@@ -113,3 +113,20 @@ std::any Get::accept(ExprVisitor & visitor) const
 {
 	return visitor.visitGetExpr(*this);
 }
+
+Set::Set(std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value) :
+	object(std::move(object)), name(std::move(name)), value(std::move(value))
+{}
+
+std::any Set::accept(ExprVisitor & visitor) const
+{
+	return visitor.visitSetExpr(*this);
+}
+
+This::This(Token keyword) :
+	keyword(keyword) {}
+
+std::any This::accept(ExprVisitor& visitor) const
+{
+	return visitor.visitThisExpr(*this);
+}

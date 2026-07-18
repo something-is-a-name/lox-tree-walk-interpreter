@@ -44,6 +44,9 @@ std::any Resolver::visitReturnStmt(const ReturnStmt& stmt)
 	}
 
 	if (stmt.value != nullptr) {
+		if (currentFunction == FunctionType::INITIAlIZER) {
+			Lox::error(stmt.keyword, "Can't return a value from an initializer");
+		}
 		resolve(*stmt.value);
 	}
 	return nullptr;
@@ -79,8 +82,27 @@ std::any Resolver::visitExpressionStmt(const Expression& stmt)
 
 std::any Resolver::visitClassStmt(const Class& stmt)
 {
+	ClassType enclosingClass = currentClass;
+	currentClass = ClassType::CLASS;
+
 	declare(stmt.name);
 	define(stmt.name);
+
+	beginScope();
+	scopes.back().emplace("this", true);
+
+	for (const std::unique_ptr<Function>& method : stmt.methods) {
+		FunctionType declaration = FunctionType::METHOD;
+		if (method->name.lexeme == "init") {
+			declaration = FunctionType::INITIAlIZER;
+			declaration = FunctionType::INITIAlIZER;
+		}
+		resolveFunction(*method, declaration);
+	}
+
+	endScope();
+
+	currentClass = enclosingClass;
 	return nullptr;
 }
 
@@ -164,6 +186,24 @@ std::any Resolver::visitTernaryExpr(const Ternary& expr)
 std::any Resolver::visitGetExpr(const Get& expr)
 {
 	resolve(*expr.object);
+	return nullptr;
+}
+
+std::any Resolver::visitSetExpr(const Set& expr)
+{
+	resolve(*expr.value);
+	resolve(*expr.object);
+
+	return nullptr;
+}
+
+std::any Resolver::visitThisExpr(const This& expr)
+{
+	if (currentClass == ClassType::NONE) {
+		Lox::error(expr.keyword, "Can't use 'this' outside of a class.");
+	}
+
+	resolveLocal(expr, expr.keyword);
 	return nullptr;
 }
 

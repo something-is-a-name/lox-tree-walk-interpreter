@@ -18,6 +18,8 @@ class Assign;
 class Logical;
 class Call;
 class Get;
+class Set;
+class This;
 
 class ExprVisitor {
 public:
@@ -32,13 +34,15 @@ public:
     virtual std::any visitLogicalExpr(const Logical& expr) = 0;
     virtual std::any visitCallExpr(const Call& expr) = 0;
     virtual std::any visitGetExpr(const Get& expr) = 0;
+    virtual std::any visitSetExpr(const Set& expr) = 0;
+    virtual std::any visitThisExpr(const This& expr) = 0;
 
     virtual ~ExprVisitor() = default;
 };
 
 class Expr {
 public:
-    virtual ~Expr() = 0;
+    virtual ~Expr();
     virtual std::any accept(ExprVisitor& visitor) const = 0;
 };
 
@@ -154,4 +158,24 @@ public:
 
     std::unique_ptr<Expr> object;
     Token name;
+};
+
+class Set : public Expr {
+public:
+    Set(std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value);
+
+    std::any accept(ExprVisitor& visitor)const override;
+
+    std::unique_ptr<Expr> object;
+    Token name;
+    std::unique_ptr<Expr> value;
+};
+
+class This : public Expr {
+public:
+    This(Token keyword);
+
+    std::any accept(ExprVisitor& visitor)const  override;
+
+    Token keyword;
 };
