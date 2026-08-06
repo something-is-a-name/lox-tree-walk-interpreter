@@ -177,9 +177,43 @@ std::any Interpreter::visitThisExpr(const This& expr) {
 	return lookUpVariable(expr.keyword, expr);
 }
 
+std::any Interpreter::visitSuperExpr(const Super& expr) {
+	int distance = locals.at(&expr);
+	LoxClass superclass = std::any_cast<LoxClass>(environment->getAt(distance, "super"));
+
+	LoxInstance object = std::any_cast<LoxInstance>(environment->getAt(distance - 1, "this"));
+
+	LoxFunction* method = superclass.findMethod(expr.method.lexeme);
+	
+	if (method == nullptr) {
+		throw RuntimeError(expr.method, "Undefined method" + expr.method.lexeme + "'.");
+	}
+
+	return method->bind(object);
+
+}
+
 std::any Interpreter::visitClassStmt(const Class& stmt)
 {
+	std::any superclass;
+	if (stmt.superclass != nullptr) {
+		superclass = evaluate(*stmt.superclass);
+
+		if (!(superclass.type() == typeid(LoxClass*))) {
+			throw RuntimeError(stmt.superclass->name, "Superclass must be a class.");
+		}
+	}
+
+
 	environment->define(stmt.name.lexeme, nullptr);
+
+	Environment* previous = environment;
+
+	if (stmt.superclass != nullptr) {
+		environment = new Environment(previous);
+		environment->define("super", superclass);
+	}
+
 
 	std::map<std::string, LoxFunction> methods {};
 	for (const std::unique_ptr<Function>& method : stmt.methods) {
@@ -187,7 +221,10 @@ std::any Interpreter::visitClassStmt(const Class& stmt)
 		methods.emplace((*method).name.lexeme, function);
 	}
 
-	LoxClass klass = LoxClass(stmt.name.lexeme, methods);
+	LoxClass klass = LoxClass(stmt.name.lexeme, std::any_cast<LoxClass*>(superclass), methods);
+
+	environment = previous;
+
 	environment->assign(stmt.name, klass);
 	return nullptr;
 }

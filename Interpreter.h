@@ -47,6 +47,8 @@ public:
 
 	std::any visitThisExpr(const This& expr) override;
 
+	std::any visitSuperExpr(const Super& expr) override;
+
 	std::any visitExpressionStmt(const Expression& stmt) override;
 
 	std::any visitPrintStmt(const Print& stmt) override;

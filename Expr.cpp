@@ -130,3 +130,14 @@ std::any This::accept(ExprVisitor& visitor) const
 {
 	return visitor.visitThisExpr(*this);
 }
+
+// Super
+
+Super::Super(Token keyword, Token method) :
+	keyword(keyword), method(method)
+{}
+
+std::any Super::accept(ExprVisitor & visitor) const
+{
+	return visitor.visitSuperExpr(*this);
+}

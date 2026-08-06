@@ -1,8 +1,8 @@
 #include "LoxClass.h"
 #include "LoxInstance.h"
 
-LoxClass::LoxClass(std::string name , std::map<std::string, LoxFunction> methods) :
-	name(std::move(name)), methods(std::move(methods)) {}
+LoxClass::LoxClass(std::string name , LoxClass* superclass, std::map<std::string, LoxFunction> methods) :
+	name(std::move(name)), superclass(superclass), methods(std::move(methods)) {}
 
 int LoxClass::arity() 
 {
@@ -22,6 +22,10 @@ LoxFunction* LoxClass::findMethod(std::string name)
     auto it = methods.find(name);
     if (it != methods.end()) {
         return &it->second;
+    }
+
+    if (superclass != nullptr) {
+        return superclass->findMethod(name);
     }
 
     return nullptr;

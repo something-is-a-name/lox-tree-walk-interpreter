@@ -20,6 +20,7 @@ class Call;
 class Get;
 class Set;
 class This;
+class Super;
 
 class ExprVisitor {
 public:
@@ -36,6 +37,7 @@ public:
     virtual std::any visitGetExpr(const Get& expr) = 0;
     virtual std::any visitSetExpr(const Set& expr) = 0;
     virtual std::any visitThisExpr(const This& expr) = 0;
+    virtual std::any visitSuperExpr(const Super& expr) = 0;
 
     virtual ~ExprVisitor() = default;
 };
@@ -178,4 +180,14 @@ public:
     std::any accept(ExprVisitor& visitor)const  override;
 
     Token keyword;
+};
+
+class Super : public Expr {
+public:
+    Super(Token keyword, Token method);
+
+    std::any accept(ExprVisitor& visitor)const override;
+
+    Token keyword;
+    Token method;
 };

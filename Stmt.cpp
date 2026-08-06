@@ -83,7 +83,7 @@ std::any ReturnStmt::accept(StmtVisitor& visitor)const {
 
 // Class
 
-Class::Class(Token name, std::vector<std::unique_ptr<Function>> methods) :
+Class::Class(Token name, std::unique_ptr<Variable> superclass, std::vector<std::unique_ptr<Function>> methods) :
 	name(std::move(name)), methods(std::move(methods)) {}
 
 std::any Class::accept(StmtVisitor& visitor) const

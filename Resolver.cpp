@@ -88,6 +88,20 @@ std::any Resolver::visitClassStmt(const Class& stmt)
 	declare(stmt.name);
 	define(stmt.name);
 
+	if (stmt.superclass != nullptr && stmt.name.lexeme == stmt.superclass->name.lexeme) {
+		Lox::error(stmt.superclass->name, "A class can't inherit from itself");
+	}
+
+	if (stmt.superclass != nullptr) {
+		currentClass = ClassType::SUBCLASS;
+		resolve(*stmt.superclass);
+	}
+
+	if (stmt.superclass != nullptr) {
+		beginScope();
+		scopes.back().emplace("super", true);
+	}
+
 	beginScope();
 	scopes.back().emplace("this", true);
 
@@ -101,6 +115,8 @@ std::any Resolver::visitClassStmt(const Class& stmt)
 	}
 
 	endScope();
+
+	if (stmt.superclass != nullptr) endScope();
 
 	currentClass = enclosingClass;
 	return nullptr;
@@ -201,6 +217,19 @@ std::any Resolver::visitThisExpr(const This& expr)
 {
 	if (currentClass == ClassType::NONE) {
 		Lox::error(expr.keyword, "Can't use 'this' outside of a class.");
+	}
+
+	resolveLocal(expr, expr.keyword);
+	return nullptr;
+}
+
+std::any Resolver::visitSuperExpr(const Super& expr)
+{
+	if (currentClass == ClassType::NONE) {
+		Lox::error(expr.keyword, "Can't use 'super' outside of a class.");
+	}
+	else if (currentClass != ClassType::SUBCLASS) {
+		Lox::error(expr.keyword, "Can't use 'super' in a class with no superclass.");
 	}
 
 	resolveLocal(expr, expr.keyword);

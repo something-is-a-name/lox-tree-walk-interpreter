@@ -54,27 +54,27 @@ void Lox::runPrompt() {
      hadRuntimeError = true;
  }
 
- void Lox::run(const std::string& source) {
-     Scanner scanner = Scanner(source);
-     std::vector<Token> tokens = scanner.scanTokens();
-     Parser parser = Parser(tokens);
-     std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
+ void Lox::run(const std::string& source)
+ {
+     Scanner scanner(source);
+     auto tokens = scanner.scanTokens();
+
+     Parser parser(tokens);
+     auto statements = parser.parse();
+
      if (hadError) return;
 
      Resolver resolver(interpreter);
-
      resolver.resolve(statements);
 
      if (hadError) return;
 
-     interpreter.interpret(statements);
 
-     // keep the AST alive for the rest of the program's life,
-     // since LoxFunction holds raw pointers into it
-     for (auto& s : statements) {
-         allStatements.push_back(std::move(s));
-     }
+     for (auto& stmt : statements)
+         allStatements.push_back(std::move(stmt));
 
+
+     interpreter.interpret(allStatements);
  }
 
 

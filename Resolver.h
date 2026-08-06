@@ -55,6 +55,8 @@ public:
 
 	std::any visitThisExpr(const This& expr) override;
 
+	std::any visitSuperExpr(const Super& expr) override;
+
 
 
 	void resolve(const std::vector<std::unique_ptr<Stmt>>& statements);
@@ -73,7 +75,8 @@ private:
 
 	enum class ClassType {
 		NONE,
-		CLASS
+		CLASS,
+		SUBCLASS
 	};
 
 	FunctionType currentFunction = FunctionType::NONE;

@@ -7,7 +7,7 @@
 
 class LoxClass : public LoxCallable {
 public:
-	LoxClass(std::string name, std::map<std::string, LoxFunction> methods);
+	LoxClass(std::string name, LoxClass* superclass, std::map<std::string, LoxFunction> methods);
 
 	int arity()  override;
 
@@ -19,5 +19,6 @@ public:
 		const std::vector<std::any> arguments) override;
 private:
 	std::string name;
+	LoxClass* superclass;
 	std::map<std::string, LoxFunction> methods;
 };
