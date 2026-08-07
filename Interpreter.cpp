@@ -181,7 +181,10 @@ std::any Interpreter::visitSuperExpr(const Super& expr) {
 	int distance = locals.at(&expr);
 	LoxClass superclass = std::any_cast<LoxClass>(environment->getAt(distance, "super"));
 
-	LoxInstance object = std::any_cast<LoxInstance>(environment->getAt(distance - 1, "this"));
+	auto object = std::any_cast<std::shared_ptr<LoxInstance>>(
+		environment->getAt(distance - 1, "this")
+	);
+
 
 	LoxFunction* method = superclass.findMethod(expr.method.lexeme);
 	
@@ -206,7 +209,6 @@ std::any Interpreter::visitClassStmt(const Class& stmt)
 
 
 	environment->define(stmt.name.lexeme, nullptr);
-
 	Environment* previous = environment;
 
 	if (stmt.superclass != nullptr) {
@@ -220,12 +222,16 @@ std::any Interpreter::visitClassStmt(const Class& stmt)
 		LoxFunction function = LoxFunction(*method, environment, false);
 		methods.emplace((*method).name.lexeme, function);
 	}
+	auto klass = std::make_shared<LoxClass>(
+		stmt.name.lexeme,
+		stmt.superclass ? std::any_cast<LoxClass*>(superclass) : nullptr,
+		methods
+	);
 
-	LoxClass klass = LoxClass(stmt.name.lexeme, std::any_cast<LoxClass*>(superclass), methods);
 
 	environment = previous;
 
-	environment->assign(stmt.name, klass);
+	environment->assign(stmt.name, std::static_pointer_cast<LoxCallable>(klass));
 	return nullptr;
 }
 
@@ -268,29 +274,30 @@ std::any Interpreter::visitPrintStmt(const Print& stmt) {
 	return nullptr;
 }
 
-std::any Interpreter::visitGetExpr(const Get& expr)
-{
+std::any Interpreter::visitGetExpr(const Get& expr) {
 	std::any object = evaluate(*expr.object);
-	
-	if (object.type() == typeid(LoxInstance)) {
-		return std::any_cast<LoxInstance>(object).get(expr.name);
-	} 
 
-	throw new RuntimeError(expr.name, "Only instances have properties.");
-	return std::any();
+	auto instance = std::any_cast<std::shared_ptr<LoxInstance>>(&object);
+
+	if (instance == nullptr) {
+		throw RuntimeError(expr.name, "Only instances have properties.");
+	}
+
+	return (*instance)->get(expr.name);
 }
 
 std::any Interpreter::visitSetExpr(const Set& expr) {
 	std::any object = evaluate(*expr.object);
 
-	if (!(object.type() == typeid(LoxInstance))) {
-		throw new RuntimeError(expr.name, "Only instances have fields.");
+	auto instance = std::any_cast<std::shared_ptr<LoxInstance>>(&object);
+
+	if (instance == nullptr) {
+		throw RuntimeError(expr.name, "Only instances have fields.");
 	}
 
 	std::any value = evaluate(*expr.value);
-	std::any_cast<LoxInstance>(object).set(expr.name, value);
+	(*instance)->set(expr.name, value);
 	return value;
-
 }
 
 std::any Interpreter::visitVarStmt(const Var& stmt) {
@@ -418,23 +425,32 @@ void Interpreter::checkNumberOperands(Token op, std::any& left, std::any& right)
 }
 
 std::string Interpreter::stringify(const std::any& v) {
-	if (!v.has_value()) return "nil";
+	if (!v.has_value())
+		return "nil";
 
 	if (v.type() == typeid(double)) {
-		double x = asNumber(v);
-
-		std::ostringstream out {};
-		out << x;
+		std::ostringstream out;
+		out << asNumber(v);
 		return out.str();
 	}
 
-	if (v.type() == typeid(bool)) {
-		if (asBool(v)) { return "true"; }
-		else { return "false"; }
-	}
+	if (v.type() == typeid(bool))
+		return asBool(v) ? "true" : "false";
 
-	else {
+	if (v.type() == typeid(std::string))
 		return asString(v);
 
+	if (v.type() == typeid(LoxClass))
+		return std::any_cast<LoxClass>(v).toString();
+
+	if (v.type() == typeid(std::shared_ptr<LoxInstance>)) {
+		return std::any_cast<std::shared_ptr<LoxInstance>>(v)->toString();
 	}
+
+	if (v.type() == typeid(std::shared_ptr<LoxCallable>)) {
+		return std::any_cast<std::shared_ptr<LoxCallable>>(v)->toString();
+	}
+
+
+	return "<unknown>";
 }

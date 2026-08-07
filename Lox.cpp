@@ -54,29 +54,26 @@ void Lox::runPrompt() {
      hadRuntimeError = true;
  }
 
- void Lox::run(const std::string& source)
- {
-     Scanner scanner(source);
-     auto tokens = scanner.scanTokens();
 
-     Parser parser(tokens);
-     auto statements = parser.parse();
+     void Lox::run(const std::string & source)
+     {
+         Scanner scanner(source);
+         auto tokens = scanner.scanTokens();
 
-     if (hadError) return;
+         Parser parser(tokens);
+         auto statements = parser.parse();
 
-     Resolver resolver(interpreter);
-     resolver.resolve(statements);
+         if (hadError) return;
 
-     if (hadError) return;
+         Resolver resolver(interpreter);
+         resolver.resolve(statements);
 
+         if (hadError) return;
 
-     for (auto& stmt : statements)
-         allStatements.push_back(std::move(stmt));
-
-
-     interpreter.interpret(allStatements);
+         interpreter.interpret(statements);
+     
  }
-
+   
 
  void Lox::report(int line, const std::string& where, const std::string& message) {
      std::cerr << "[line " << line << "] Error" << where << ": " << message << '\n';

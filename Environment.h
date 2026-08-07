@@ -12,7 +12,7 @@ public:
 
 	void define(std::string name, std::any value);
 
-	Environment ancestor(int distance);
+	Environment* ancestor(int distance);
 
 	std::any get(Token name);
 

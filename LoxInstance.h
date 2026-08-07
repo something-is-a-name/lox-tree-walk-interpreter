@@ -1,11 +1,12 @@
 #pragma once
 #include "Token.h"
 #include <map>
+#include <memory>
 #include "RuntimeError.h"
 
 class LoxClass;
 
-class LoxInstance {
+class LoxInstance : public std::enable_shared_from_this<LoxInstance> {
 public:
 	LoxInstance(LoxClass* klass);
 

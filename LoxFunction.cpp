@@ -37,9 +37,10 @@ std::any LoxFunction::call(Interpreter& interpreter,
     return nullptr;
 }
 
-LoxFunction LoxFunction::bind(const LoxInstance& instance)
+LoxFunction LoxFunction::bind(std::shared_ptr<LoxInstance> instance)
 {
-    Environment environment(closure);
-    environment.define("this", instance);
-    return LoxFunction(*declaration, &environment, isInitializer);
+    Environment* environment = new Environment(closure);
+    environment->define("this", instance);
+
+    return LoxFunction(*declaration, environment, isInitializer);
 }

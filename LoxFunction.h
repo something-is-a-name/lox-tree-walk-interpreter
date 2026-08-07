@@ -20,7 +20,7 @@ public:
 
 	std::any call(Interpreter& interpreter, std::vector<std::any> arguments) override;
 
-	LoxFunction bind(const LoxInstance& instance);
+	LoxFunction bind(std::shared_ptr<LoxInstance> instance);
 
 private:
 	const Function* declaration;

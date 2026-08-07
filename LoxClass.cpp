@@ -33,7 +33,7 @@ LoxFunction* LoxClass::findMethod(std::string name)
 
 std::any LoxClass::call(Interpreter& interpreter, const std::vector<std::any> arguments)
 {
-	LoxInstance instance(this);
+    auto instance = std::make_shared<LoxInstance>(this);
 
     LoxFunction* initializer = findMethod("init");
     if (initializer != nullptr) {

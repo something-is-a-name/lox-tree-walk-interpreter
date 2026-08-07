@@ -1,4 +1,5 @@
 #include "LoxInstance.h"
+#include "LoxFunction.h"
 #include "LoxClass.h"
 
 LoxInstance::LoxInstance(LoxClass* klass) :
@@ -15,7 +16,7 @@ std::any LoxInstance::get(Token name) {
 	}
 
 	LoxFunction* method = klass->findMethod(name.lexeme);
-	if (method != nullptr) return method->bind(*this);
+	if (method != nullptr) return method->bind(shared_from_this());
 
 
 	throw new RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
@@ -23,5 +24,5 @@ std::any LoxInstance::get(Token name) {
 
 void LoxInstance::set(Token name, std::any value)
 {
-	fields.emplace(name.lexeme, value);
+	fields[name.lexeme] = value;
 }
