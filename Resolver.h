@@ -47,6 +47,10 @@ public:
 
 	std::any visitCommaExpr(const Comma& expr) override;
 
+	std::any visitArrayExpr(const Array& expr) override;
+
+	std::any visitIndexExpr(const Index& expr) override;
+
 	std::any visitTernaryExpr(const Ternary& expr) override;
 
 	std::any visitGetExpr(const Get& expr) override;

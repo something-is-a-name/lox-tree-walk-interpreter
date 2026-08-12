@@ -141,3 +141,25 @@ std::any Super::accept(ExprVisitor & visitor) const
 {
 	return visitor.visitSuperExpr(*this);
 }
+
+// Array
+
+Array::Array(std::vector<std::unique_ptr<Expr>> elems) :
+	elems(std::move(elems))
+{}
+
+std::any Array::accept(ExprVisitor& visitor) const
+{
+	return visitor.visitArrayExpr(*this);
+}
+
+// Index
+
+Index::Index(Token token, std::unique_ptr<Expr> arr, std::unique_ptr<Expr> index) :
+	token(std::move(token)),arr(std::move(arr)), index(std::move(index))
+{}
+
+std::any Index::accept(ExprVisitor & visitor) const
+{
+	return visitor.visitIndexExpr(*this);
+}

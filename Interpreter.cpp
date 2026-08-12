@@ -73,6 +73,7 @@ std::any Interpreter::visitBinaryExpr(const Binary& expr)  {
 		return asNumber(left) - asNumber(right);
 	case SLASH:
 		checkNumberOperands(expr.op, left, right);
+		if (asNumber(right) == 0) throw RuntimeError(expr.op, "Divide by zero not allowed.");
 		return asNumber(left) / asNumber(right);
 	case STAR:
 		checkNumberOperands(expr.op, left, right);
@@ -342,6 +343,38 @@ std::any Interpreter::visitWhileStmt(const While& stmt) {
 
 }
 
+std::any Interpreter::visitArrayExpr(const Array& expr)
+{
+	std::vector<std::any> values = {};
+
+	for (const auto& elem : expr.elems)
+	{
+		values.push_back(evaluate(*elem));
+	}
+
+	return values;
+}
+
+std::any Interpreter::visitIndexExpr(const Index& expr) {
+	std::any arrVal = evaluate(*expr.arr);
+	std::any indexVal = evaluate(*expr.index);
+
+	const auto& arr = std::any_cast<const std::vector<std::any>&>(arrVal);
+	 double index = asNumber(indexVal);
+
+	 if (index != std::floor(index)) {
+		 throw RuntimeError(expr.token, "Array index must be an integer.");
+	 }
+
+	 if (index < 0 || index >= arr.size()) {
+		 throw RuntimeError(expr.token, "Array index out of bounds.");
+	 }
+
+	 return arr[index];
+
+}
+
+
 std::any Interpreter::visitFunctionStmt(const Function& stmt) {
 	auto function = std::make_shared<LoxFunction>(stmt, environment, false);
 
@@ -449,6 +482,25 @@ std::string Interpreter::stringify(const std::any& v) {
 
 	if (v.type() == typeid(std::shared_ptr<LoxCallable>)) {
 		return std::any_cast<std::shared_ptr<LoxCallable>>(v)->toString();
+	}
+
+	if (v.type() == typeid(std::vector<std::any>)) {
+
+		const auto& array = std::any_cast<const std::vector<std::any>&>(v);
+
+		std::string result = "[";
+
+		for (int i = 0; i < array.size(); i++) {
+			result += stringify(array[i]);
+			
+			if (i + 1 < array.size()) result += ", ";
+		}
+
+		result += "]";
+		
+		return result;
+
+
 	}
 
 

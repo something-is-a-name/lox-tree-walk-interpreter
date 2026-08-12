@@ -324,6 +324,26 @@ std::unique_ptr<Expr> Parser::comma() {
 	return std::make_unique<Comma>(std::move(exprs));
 }
 
+
+std::unique_ptr<Expr> Parser::array()
+{
+	std::vector<std::unique_ptr<Expr>> elems;
+
+	if (!check(RIGHT_BRACKET))
+	{
+		do
+		{
+
+			elems.push_back(ternary());
+
+		} while (match({ COMMA }));
+	}
+
+	consume(RIGHT_BRACKET, "Expected ']' at the end of array.");
+
+	return std::make_unique<Array>(std::move(elems));
+}
+
 std::unique_ptr<Expr> Parser::ternary() {
 	auto expr = equality();
 
@@ -411,6 +431,15 @@ std::unique_ptr<Expr> Parser::call() {
 		if (match({ LEFT_PAREN })) {
 			expr = finishCall(std::move(expr));
 		}
+		else if (match({ LEFT_BRACKET })) {
+			Token token = previous();
+			auto index = expression();
+			
+			consume(RIGHT_BRACKET, "Expected ']' after index.");
+
+			expr = std::make_unique<Index>(token,std::move(expr), std::move(index));
+
+		}
 		else if (match({ DOT })) {
 			Token name = consume(IDENTIFIER, "Expected property name after '.'");
 			expr = std::make_unique<Get>(std::move(expr), std::move(name));
@@ -467,6 +496,10 @@ std::unique_ptr<Expr> Parser::primary() {
 		std::unique_ptr<Expr> expr = expression();
 		consume(RIGHT_PAREN, "Expected ')' after expression.");
 		return std::make_unique<Grouping>(std::move(expr));
+	}
+
+	if (match({ LEFT_BRACKET })) {
+		return array();
 	}
 
 	throw error(peek(), "Expected expression.");

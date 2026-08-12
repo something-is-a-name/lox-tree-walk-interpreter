@@ -33,6 +33,8 @@ public:
 
 	std::any visitTernaryExpr(const Ternary& expr) override;
 
+	std::any visitArrayExpr(const Array& expr) override;
+
 	std::any visitAssignExpr(const Assign& expr) override;
 
 	std::any visitVariableExpr(const Variable& expr) override;
@@ -46,6 +48,8 @@ public:
 	std::any visitSetExpr(const Set& expr) override;
 
 	std::any visitThisExpr(const This& expr) override;
+
+	std::any visitIndexExpr(const Index& expr) override;
 
 	std::any visitSuperExpr(const Super& expr) override;
 

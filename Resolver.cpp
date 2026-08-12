@@ -191,6 +191,21 @@ std::any Resolver::visitCommaExpr(const Comma& expr)
 	return nullptr;
 }
 
+std::any Resolver::visitArrayExpr(const Array& expr)
+{
+	resolve(expr.elems);
+
+	return nullptr;
+}
+
+std::any Resolver::visitIndexExpr(const Index& expr)
+{
+	resolve(*expr.arr);
+	resolve(*expr.index);
+
+	return nullptr;
+}
+
 std::any Resolver::visitTernaryExpr(const Ternary& expr)
 {
 	resolve(*expr.condition);

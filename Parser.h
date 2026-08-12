@@ -70,6 +70,9 @@ private:
 
 	std::unique_ptr<Expr> andExpr();
 
+	std::unique_ptr<Expr> array();
+
+
 	std::unique_ptr<Expr> comma();
 
 	std::unique_ptr<Expr> ternary();

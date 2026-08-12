@@ -21,6 +21,8 @@ class Get;
 class Set;
 class This;
 class Super;
+class Array;
+class Index;
 
 class ExprVisitor {
 public:
@@ -38,6 +40,8 @@ public:
     virtual std::any visitSetExpr(const Set& expr) = 0;
     virtual std::any visitThisExpr(const This& expr) = 0;
     virtual std::any visitSuperExpr(const Super& expr) = 0;
+    virtual std::any visitArrayExpr(const Array& expr) = 0;
+    virtual std::any visitIndexExpr(const Index& expr) = 0;
 
     virtual ~ExprVisitor() = default;
 };
@@ -190,4 +194,23 @@ public:
 
     Token keyword;
     Token method;
+};
+
+class Array : public Expr {
+public:
+    Array(std::vector<std::unique_ptr<Expr>> elems);
+
+    std::any accept(ExprVisitor& viistor)const  override;
+    std::vector<std::unique_ptr<Expr>> elems;
+};
+
+class Index : public Expr {
+public:
+    Index(Token token, std::unique_ptr<Expr> arr, std::unique_ptr<Expr> index);
+
+    std::any accept(ExprVisitor& visitor)const  override;
+
+    Token token;
+    std::unique_ptr<Expr> arr;
+    std::unique_ptr<Expr> index;
 };
